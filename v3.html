@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMU — Inspiring Multicultural Understanding</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0f1f3d;
+      --navy-mid:   #1a3260;
+      --navy-lt:    #2a4a7f;
+      --gold:       #b8922a;
+      --gold-lt:    #d4ab4e;
+      --gold-pale:  #f0e4c4;
+      --cream:      #faf7f2;
+      --cream-dark: #f0ead8;
+      --warm-white: #fffdf9;
+      --ink:        #1a1208;
+      --ink-mid:    #3d2e14;
+      --ink-muted:  #6b5535;
+      --rule:       1px solid #c8b890;
+      --rule-heavy: 2px solid #b8922a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'EB Garamond', Georgia, serif;
+      line-height: 1.6;
+    }
+
+    /* ─── UTILITY ─── */
+    .sans { font-family: 'Inter', Arial, sans-serif; }
+    .small-caps {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .rule-gold { border: none; border-top: var(--rule-heavy); }
+    .rule-thin { border: none; border-top: var(--rule); }
+
+    /* ─── MASTHEAD / NAV ─── */
+    .masthead {
+      background: var(--navy);
+      color: var(--warm-white);
+      padding: 0;
+    }
+
+    .masthead-top {
+      border-bottom: 1px solid rgba(184,146,42,.3);
+      padding: .6rem 3.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .masthead-date {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .65rem;
+      font-weight: 400;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+    }
+
+    .masthead-donate-top {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .65rem;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .masthead-donate-top:hover { color: var(--warm-white); }
+
+    .masthead-main {
+      padding: 2.8rem 3.5rem 2.2rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(184,146,42,.25);
+    }
+
+    .org-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 400;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--warm-white);
+      line-height: 1;
+    }
+
+    .org-name em {
+      font-style: italic;
+      color: var(--gold-lt);
+    }
+
+    .org-subtitle {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .72rem;
+      font-weight: 400;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.45);
+      margin-top: .8rem;
+    }
+
+    .gold-rule {
+      width: 60px;
+      height: 1.5px;
+      background: var(--gold);
+      margin: 1.2rem auto 0;
+    }
+
+    .masthead-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2.8rem;
+      padding: .9rem 3.5rem;
+    }
+
+    .masthead-nav a {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .67rem;
+      font-weight: 500;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .masthead-nav a:hover { color: var(--gold-lt); }
+
+    .masthead-nav .nav-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: rgba(184,146,42,.4);
+    }
+
+    /* ─── HERO SPREAD ─── */
+    .hero-spread {
+      background: var(--warm-white);
+      padding: 5rem 3.5rem 4rem;
+      border-bottom: var(--rule-heavy);
+    }
+
+    .hero-kicker {
+      text-align: center;
+      margin-bottom: 2.4rem;
+    }
+
+    .hero-headline {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(3.2rem, 7vw, 6.5rem);
+      font-weight: 400;
+      font-style: italic;
+      text-align: center;
+      line-height: 1.05;
+      letter-spacing: -.01em;
+      color: var(--navy);
+      max-width: 900px;
+      margin: 0 auto 1rem;
+    }
+
+    .hero-headline strong {
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .hero-deck {
+      text-align: center;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.2rem;
+      font-style: italic;
+      color: var(--ink-muted);
+      max-width: 580px;
+      margin: 0 auto 3rem;
+      line-height: 1.55;
+    }
+
+    /* Donate CTA above fold */
+    .hero-donate-strip {
+      max-width: 680px;
+      margin: 0 auto 3.5rem;
+      border: 1px solid var(--gold);
+      padding: 1.4rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 1.5rem;
+      background: var(--gold-pale);
+    }
+
+    @media (max-width: 580px) {
+      .hero-donate-strip { grid-template-columns: 1fr; text-align: center; }
+    }
+
+    .donate-strip-text {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--ink-mid);
+    }
+
+    .donate-strip-text strong {
+      display: block;
+      font-size: 1.05rem;
+      color: var(--navy);
+      margin-bottom: .2rem;
+    }
+
+    .btn-gold {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--navy);
+      background: var(--gold);
+      padding: .8rem 1.8rem;
+      transition: background .2s, color .2s;
+      white-space: nowrap;
+      display: inline-block;
+    }
+
+    .btn-gold:hover { background: var(--navy); color: var(--gold-lt); }
+
+    .btn-navy {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--warm-white);
+      background: var(--navy);
+      padding: .8rem 1.8rem;
+      transition: background .2s, color .2s;
+      display: inline-block;
+    }
+
+    .btn-navy:hover { background: var(--navy-mid); }
+
+    .btn-outline-navy {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--navy);
+      border: 1px solid var(--navy);
+      padding: .78rem 1.8rem;
+      transition: background .2s, color .2s;
+      display: inline-block;
+    }
+
+    .btn-outline-navy:hover { background: var(--navy); color: var(--warm-white); }
+
+    /* Two-col layout hero body */
+    .hero-columns {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 0 3rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-col-divider {
+      background: var(--gold);
+      opacity: .4;
+    }
+
+    .hero-col p {
+      font-size: 1.08rem;
+      line-height: 1.9;
+      color: var(--ink-mid);
+    }
+
+    .hero-col p + p { margin-top: 1em; }
+
+    /* ─── IMPACT FIGURES ─── */
+    .figures-band {
+      background: var(--navy);
+      padding: 3.2rem 3.5rem;
+      border-bottom: 3px solid var(--gold);
+    }
+
+    .figures-inner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 700px) {
+      .figures-inner { grid-template-columns: 1fr 1fr; }
+    }
+
+    .figure-item {
+      padding: 0 2.5rem;
+      border-right: 1px solid rgba(184,146,42,.25);
+      text-align: center;
+    }
+
+    .figure-item:first-child { padding-left: 0; }
+    .figure-item:last-child  { border-right: none; padding-right: 0; }
+
+    .figure-num {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.4rem, 4vw, 3.6rem);
+      font-weight: 400;
+      color: var(--gold-lt);
+      line-height: 1;
+      letter-spacing: -.02em;
+    }
+
+    .figure-label {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .62rem;
+      font-weight: 500;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+      margin-top: .6rem;
+      line-height: 1.4;
+    }
+
+    /* ─── ARTICLE LAYOUT ─── */
+    .article-section {
+      padding: 5rem 3.5rem;
+      border-bottom: var(--rule-heavy);
+    }
+
+    .article-section.cream-bg { background: var(--warm-white); }
+    .article-section.tinted   { background: var(--cream-dark); }
+
+    .section-rule-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2.8rem;
+    }
+
+    .section-rule-group::before,
+    .section-rule-group::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gold);
+      opacity: .5;
+    }
+
+    /* Mission two-column */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    @media (max-width: 760px) {
+      .two-col      { grid-template-columns: 1fr; gap: 2.5rem; }
+      .three-col    { grid-template-columns: 1fr !important; }
+      .hero-columns { grid-template-columns: 1fr; }
+      .hero-col-divider { display: none; }
+    }
+
+    .col-heading {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.9rem, 3.5vw, 2.7rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--navy);
+      line-height: 1.15;
+      margin-bottom: 1.4rem;
+    }
+
+    .col-heading strong { font-style: normal; font-weight: 700; }
+
+    .body-text {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1.08rem;
+      line-height: 1.9;
+      color: var(--ink-mid);
+    }
+
+    .body-text + .body-text { margin-top: 1em; }
+
+    /* Drop cap */
+    .drop-cap::first-letter {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 4.2em;
+      font-weight: 700;
+      float: left;
+      line-height: .75;
+      margin-right: .08em;
+      margin-top: .06em;
+      color: var(--navy);
+    }
+
+    /* Pull quote */
+    .pull-quote {
+      border-top: var(--rule-heavy);
+      border-bottom: var(--rule-heavy);
+      padding: 2rem 0;
+      margin: 2.5rem 0;
+    }
+
+    .pull-quote blockquote {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.45rem;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--navy);
+      line-height: 1.45;
+    }
+
+    .pull-quote cite {
+      display: block;
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 1rem;
+      font-style: normal;
+    }
+
+    /* Pillar list */
+    .pillar-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+      margin-top: 2rem;
+    }
+
+    .pillar-item {}
+
+    .pillar-num {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.6rem;
+      font-style: italic;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: .3rem;
+    }
+
+    .pillar-title {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--navy);
+      margin-bottom: .4rem;
+    }
+
+    .pillar-body {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      color: var(--ink-muted);
+      line-height: 1.75;
+    }
+
+    /* Decorated box */
+    .info-box {
+      border: 1px solid var(--gold);
+      padding: 2rem 1.8rem;
+      background: var(--gold-pale);
+      margin-top: 2.5rem;
+    }
+
+    .info-box .box-head {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .63rem;
+      font-weight: 600;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      padding-bottom: .6rem;
+      border-bottom: 1px solid rgba(184,146,42,.3);
+    }
+
+    .info-box p {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      color: var(--ink-mid);
+      line-height: 1.75;
+    }
+
+    /* ─── TESTIMONIALS ─── */
+    .three-col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+    }
+
+    .testi-article {
+      padding-top: 1.5rem;
+      border-top: var(--rule-heavy);
+    }
+
+    .testi-headline {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.15rem;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--navy);
+      line-height: 1.3;
+      margin-bottom: 1rem;
+    }
+
+    .testi-body {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--ink-mid);
+    }
+
+    .testi-byline {
+      display: flex;
+      align-items: center;
+      gap: .85rem;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: var(--rule);
+    }
+
+    .byline-initial {
+      width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-style: italic;
+      font-weight: 500;
+      flex-shrink: 0;
+      border: 1px solid var(--gold);
+      color: var(--navy);
+    }
+
+    .byline-name {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      color: var(--ink);
+    }
+
+    .byline-role {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .65rem;
+      color: var(--ink-muted);
+      letter-spacing: .04em;
+      margin-top: .15rem;
+    }
+
+    /* ─── CENTER PULL QUOTE (full bleed) ─── */
+    .editorial-break {
+      background: var(--navy);
+      padding: 5.5rem 3.5rem;
+      text-align: center;
+      border-top: 3px solid var(--gold);
+      border-bottom: 3px solid var(--gold);
+    }
+
+    .editorial-break blockquote {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.7rem, 3.5vw, 2.8rem);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--warm-white);
+      line-height: 1.35;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .editorial-break blockquote em {
+      color: var(--gold-lt);
+      font-style: normal;
+    }
+
+    .editorial-break .em-rule {
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+      margin: 1.8rem auto;
+    }
+
+    .editorial-break cite {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+      font-style: normal;
+    }
+
+    /* ─── DONATE CTA ─── */
+    .donate-section {
+      background: var(--warm-white);
+      padding: 6rem 3.5rem;
+      border-bottom: var(--rule-heavy);
+    }
+
+    .donate-inner {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 0 4rem;
+      max-width: 900px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    @media (max-width: 700px) {
+      .donate-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .donate-divider { display: none; }
+    }
+
+    .donate-divider { background: var(--gold); opacity: .35; }
+
+    .donate-left .col-heading { margin-bottom: 1.2rem; }
+
+    .donate-amounts {
+      display: flex;
+      gap: .6rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      margin-top: 1.8rem;
+    }
+
+    .amt-chip {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      padding: .55rem 1.1rem;
+      border: 1px solid var(--navy);
+      color: var(--navy);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      text-decoration: none;
+    }
+
+    .amt-chip:hover, .amt-chip.active {
+      background: var(--navy);
+      color: var(--warm-white);
+    }
+
+    .donate-right {}
+
+    .impact-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 2rem;
+    }
+
+    .impact-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.2rem;
+      align-items: baseline;
+      padding: 1rem 0;
+      border-bottom: var(--rule);
+    }
+
+    .impact-list li:first-child { border-top: var(--rule); }
+
+    .impact-amt {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.3rem;
+      font-style: italic;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    .impact-desc {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: .98rem;
+      color: var(--ink-mid);
+      line-height: 1.6;
+    }
+
+    .donate-actions {
+      display: flex;
+      gap: .8rem;
+      flex-wrap: wrap;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--navy);
+      color: rgba(255,255,255,.7);
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 0;
+      border-bottom: 1px solid rgba(184,146,42,.2);
+    }
+
+    @media (max-width: 720px) {
+      .footer-top { grid-template-columns: 1fr; }
+      .footer-col-nav { border-left: none !important; border-top: 1px solid rgba(184,146,42,.15); }
+    }
+
+    .footer-brand {
+      padding: 3.5rem 3.5rem;
+      border-right: 1px solid rgba(184,146,42,.2);
+    }
+
+    .footer-brand-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.9rem;
+      font-weight: 400;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--warm-white);
+    }
+
+    .footer-brand-name em {
+      font-style: italic;
+      color: var(--gold-lt);
+    }
+
+    .footer-brand-full {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .65rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      margin-top: .4rem;
+    }
+
+    .footer-gold-rule {
+      width: 36px;
+      height: 1px;
+      background: var(--gold);
+      opacity: .6;
+      margin: 1.4rem 0;
+    }
+
+    .footer-brand p {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: .98rem;
+      font-style: italic;
+      color: rgba(255,255,255,.45);
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .footer-col-nav {
+      padding: 3.5rem 2.5rem;
+      border-right: 1px solid rgba(184,146,42,.2);
+    }
+
+    .footer-col-nav:last-child { border-right: none; }
+
+    .footer-col-head {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .6rem;
+      font-weight: 600;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.4rem;
+      padding-bottom: .6rem;
+      border-bottom: 1px solid rgba(184,146,42,.25);
+    }
+
+    .footer-nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+
+    .footer-nav-list a {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: .98rem;
+      color: rgba(255,255,255,.5);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .footer-nav-list a:hover { color: var(--gold-lt); }
+
+    .footer-advocate {
+      padding: 1.8rem 3.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(184,146,42,.12);
+    }
+
+    .advocate-phrase {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: .95rem;
+      font-style: italic;
+      color: rgba(255,255,255,.4);
+    }
+
+    .advocate-phrase strong {
+      color: var(--gold-lt);
+      font-style: normal;
+    }
+
+    .advocate-title {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .6rem;
+      font-weight: 500;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.25);
+    }
+
+    .footer-base {
+      padding: 1.2rem 3.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    .footer-base span {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: .62rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.22);
+    }
+
+    /* ─── RESPONSIVE OVERRIDES ─── */
+    @media (max-width: 600px) {
+      .masthead-main  { padding: 2rem 1.5rem; }
+      .masthead-top,
+      .masthead-nav   { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .hero-spread,
+      .article-section,
+      .donate-section,
+      .editorial-break,
+      .figures-band,
+      .footer-brand,
+      .footer-col-nav,
+      .footer-advocate,
+      .footer-base    { padding-left: 1.5rem; padding-right: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── MASTHEAD ─── -->
+  <header class="masthead">
+    <div class="masthead-top">
+      <span class="masthead-date">Spring 2026 &ensp;·&ensp; Annual Report &amp; Appeal</span>
+      <a href="#donate" class="masthead-donate-top">Support Our Work →</a>
+    </div>
+
+    <div class="masthead-main">
+      <div class="org-name">I<em>M</em>U</div>
+      <div class="org-subtitle">Inspiring Multicultural Understanding</div>
+      <div class="gold-rule"></div>
+    </div>
+
+    <nav class="masthead-nav">
+      <a href="#mission">Mission</a>
+      <div class="nav-dot"></div>
+      <a href="#voices">Voices</a>
+      <div class="nav-dot"></div>
+      <a href="#impact">Impact</a>
+      <div class="nav-dot"></div>
+      <a href="#donate">Donate</a>
+      <div class="nav-dot"></div>
+      <a href="#">About</a>
+    </nav>
+  </header>
+
+  <!-- ─── HERO SPREAD ─── -->
+  <section class="hero-spread">
+    <div class="hero-kicker">
+      <span class="small-caps">A Message to Our Community</span>
+    </div>
+
+    <h1 class="hero-headline">
+      Every Student<br>
+      <strong>Deserves to Be Seen</strong>
+    </h1>
+
+    <p class="hero-deck">
+      On belonging, identity, and the transformative power<br>
+      of dialogue in America's classrooms.
+    </p>
+
+    <!-- Donate above fold -->
+    <div class="hero-donate-strip">
+      <div class="donate-strip-text">
+        <strong>Your gift changes a young life.</strong>
+        Every contribution funds dialogue workshops, trains student facilitators,
+        and brings IMU to schools that need it most.
+      </div>
+      <a href="#donate" class="btn-gold">Give Today</a>
+    </div>
+
+    <!-- Two-column body text -->
+    <div class="hero-columns">
+      <div class="hero-col">
+        <p class="body-text drop-cap">
+          There is a silence in many of America's classrooms — the silence of students
+          who do not see themselves in the curriculum, who have learned that certain
+          parts of their identity are safer left unspoken. It is a silence that costs us
+          dearly, not only in individual flourishing, but in our collective capacity
+          for understanding.
+        </p>
+        <p class="body-text">
+          Since 2014, Inspiring Multicultural Understanding has worked to end that
+          silence. We believe that open, honest dialogue about culture, race, and
+          identity is not a risk — it is the foundation of a genuinely educated citizenry.
+        </p>
+      </div>
+      <div class="hero-col-divider"></div>
+      <div class="hero-col">
+        <p class="body-text">
+          In our twelfth year, IMU has reached more than four thousand students across
+          thirty-eight partner schools. We have trained hundreds of young people as
+          dialogue facilitators. We have worked alongside educators to build classrooms
+          where every heritage, every story, and every identity is not merely tolerated
+          but genuinely welcomed.
+        </p>
+        <p class="body-text">
+          The work is not finished. It never will be. But with your continued support,
+          we can ensure that no student has to navigate questions of belonging alone.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FIGURES BAND ─── -->
+  <div class="figures-band" id="impact">
+    <div class="figures-inner">
+      <div class="figure-item">
+        <div class="figure-num">4,200+</div>
+        <div class="figure-label">Students<br>Reached</div>
+      </div>
+      <div class="figure-item">
+        <div class="figure-num">38</div>
+        <div class="figure-label">Partner<br>Schools</div>
+      </div>
+      <div class="figure-item">
+        <div class="figure-num">12</div>
+        <div class="figure-label">Years<br>Active</div>
+      </div>
+      <div class="figure-item">
+        <div class="figure-num">94%</div>
+        <div class="figure-label">Report Feeling<br>More Understood</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MISSION ─── -->
+  <section class="article-section cream-bg" id="mission">
+    <div class="section-rule-group">
+      <span class="small-caps">Our Mission</span>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <h2 class="col-heading">Building bridges,<br><strong>one conversation</strong><br>at a time.</h2>
+        <p class="body-text">
+          IMU is a youth-led nonprofit dedicated to cultivating empathy and belonging
+          in K–12 schools across the country. Our programs create structured dialogue
+          experiences where students explore questions of identity, culture, and race —
+          not as threats or abstractions, but as invitations to see one another fully.
+        </p>
+        <p class="body-text" style="margin-top:1em">
+          We work alongside educators, school administrators, and community leaders
+          to embed a culture of inclusion into the daily life of the schools we serve.
+        </p>
+
+        <div class="pull-quote">
+          <blockquote>
+            "A classroom where every student feels seen is not a utopia. It is a
+            choice — one that must be made deliberately, repeatedly, and together."
+          </blockquote>
+          <cite>— IMU Program Director</cite>
+        </div>
+      </div>
+
+      <div>
+        <ul class="pillar-list">
+          <li class="pillar-item">
+            <div class="pillar-num">I.</div>
+            <div class="pillar-title">Open Dialogue</div>
+            <p class="pillar-body">Safe, facilitated spaces for honest conversations about race, culture, and identity — structured to build trust before depth.</p>
+          </li>
+          <li class="pillar-item">
+            <div class="pillar-num">II.</div>
+            <div class="pillar-title">Student Voice</div>
+            <p class="pillar-body">Programs co-designed with young people, centering their lived experiences and ensuring the curriculum reflects their realities.</p>
+          </li>
+          <li class="pillar-item">
+            <div class="pillar-num">III.</div>
+            <div class="pillar-title">Educator Partnership</div>
+            <p class="pillar-body">Deep collaboration with teachers and administrators to make inclusion not a module but a permanent feature of school culture.</p>
+          </li>
+          <li class="pillar-item">
+            <div class="pillar-num">IV.</div>
+            <div class="pillar-title">Youth Leadership</div>
+            <p class="pillar-body">Students trained as facilitators go on to lead circles in their own schools — multiplying our impact far beyond our direct reach.</p>
+          </li>
+        </ul>
+
+        <div class="info-box">
+          <div class="box-head">A Note on Our Approach</div>
+          <p>IMU does not offer a single prescribed curriculum. Every school is different. Every cohort of students brings its own context, its own history, its own needs. We begin by listening — and build from there.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TESTIMONIALS ─── -->
+  <section class="article-section tinted" id="voices">
+    <div class="section-rule-group">
+      <span class="small-caps">Voices from Our Community</span>
+    </div>
+
+    <div class="three-col">
+
+      <article class="testi-article">
+        <h3 class="testi-headline">"I realized I was never as alone as I thought."</h3>
+        <p class="testi-body">
+          Before IMU, I never talked about being biracial at school. I thought no one
+          would understand. In my first dialogue circle, a girl I barely knew started
+          crying because she felt the exact same way. We became best friends. That is
+          what IMU does — it makes you realize you are never as alone as you think.
+        </p>
+        <div class="testi-byline">
+          <div class="byline-initial">M</div>
+          <div>
+            <div class="byline-name">Maya R., Age 17</div>
+            <div class="byline-role">IMU Student Participant &ensp;·&ensp; Chicago, Illinois</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="testi-article">
+        <h3 class="testi-headline">"For the first time, my culture was treated with real respect."</h3>
+        <p class="testi-body">
+          I grew up in a mostly white school and never saw my culture reflected anywhere.
+          IMU's workshops were the first time I heard my language and food and traditions
+          spoken about with genuine respect. I finally felt like I belonged — not despite
+          who I am, but because of it.
+        </p>
+        <div class="testi-byline">
+          <div class="byline-initial">J</div>
+          <div>
+            <div class="byline-name">Javier M., Age 16</div>
+            <div class="byline-role">IMU Student Leader &ensp;·&ensp; Los Angeles, California</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="testi-article">
+        <h3 class="testi-headline">"IMU didn't just change my school. It changed who I am."</h3>
+        <p class="testi-body">
+          I used to be afraid to bring up race in class. IMU trained me to lead
+          conversations I once avoided entirely. Now I run dialogue circles at my own
+          school and watch students open up in ways no textbook ever could. I didn't
+          expect to find my vocation at seventeen — but here I am.
+        </p>
+        <div class="testi-byline">
+          <div class="byline-initial">A</div>
+          <div>
+            <div class="byline-name">Aisha T., Age 18</div>
+            <div class="byline-role">IMU Youth Facilitator &ensp;·&ensp; Atlanta, Georgia</div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ─── EDITORIAL BREAK ─── -->
+  <div class="editorial-break">
+    <blockquote>
+      "A student who feels unseen cannot learn.<br>
+      Cannot lead. Cannot become who<br>
+      they were meant to be. <em>This is why we exist.</em>"
+    </blockquote>
+    <div class="em-rule"></div>
+    <cite>IMU — Inspiring Multicultural Understanding &ensp;·&ensp; Est. 2014</cite>
+  </div>
+
+  <!-- ─── DONATE ─── -->
+  <section class="donate-section" id="donate">
+    <div class="section-rule-group">
+      <span class="small-caps">Support Our Work</span>
+    </div>
+
+    <div class="donate-inner">
+      <div class="donate-left">
+        <h2 class="col-heading">Help every<br>student feel<br><strong>seen.</strong></h2>
+        <p class="body-text">
+          No student should have to navigate questions of belonging alone. Your gift —
+          at any level — funds the dialogue programs, training, and partnerships that
+          make this work possible.
+        </p>
+
+        <div class="donate-amounts">
+          <a href="#" class="amt-chip active">$25</a>
+          <a href="#" class="amt-chip">$50</a>
+          <a href="#" class="amt-chip">$100</a>
+          <a href="#" class="amt-chip">$250</a>
+          <a href="#" class="amt-chip">Other</a>
+        </div>
+
+        <div class="donate-actions">
+          <a href="#" class="btn-gold">Donate Now</a>
+          <a href="#" class="btn-outline-navy">Volunteer</a>
+        </div>
+      </div>
+
+      <div class="donate-divider"></div>
+
+      <div class="donate-right">
+        <div class="small-caps" style="margin-bottom:1.2rem">Your Gift at Work</div>
+        <ul class="impact-list">
+          <li>
+            <span class="impact-amt">$25</span>
+            <span class="impact-desc">Supplies one student with a full semester of dialogue materials and resources.</span>
+          </li>
+          <li>
+            <span class="impact-amt">$100</span>
+            <span class="impact-desc">Funds a single dialogue circle session for up to fifteen students.</span>
+          </li>
+          <li>
+            <span class="impact-amt">$250</span>
+            <span class="impact-desc">Sponsors a youth facilitator through our full leadership training program.</span>
+          </li>
+          <li>
+            <span class="impact-amt">$1,000</span>
+            <span class="impact-desc">Brings IMU into a new partner school for an entire semester.</span>
+          </li>
+        </ul>
+        <p class="body-text" style="font-size:.9rem;opacity:.7">
+          IMU is a registered 501(c)(3) nonprofit organization. All donations are
+          tax-deductible to the extent permitted by law.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-brand-name">IM<em>U</em></div>
+        <div class="footer-brand-full">Inspiring Multicultural Understanding</div>
+        <div class="footer-gold-rule"></div>
+        <p>
+          Cultivating empathy and belonging in K–12 schools across America,
+          one conversation at a time. Est. 2014.
+        </p>
+      </div>
+
+      <div class="footer-col-nav">
+        <div class="footer-col-head">Navigate</div>
+        <ul class="footer-nav-list">
+          <li><a href="#">About IMU</a></li>
+          <li><a href="#">Our Programs</a></li>
+          <li><a href="#">Partner Schools</a></li>
+          <li><a href="#">Get Involved</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col-nav">
+        <div class="footer-col-head">Support</div>
+        <ul class="footer-nav-list">
+          <li><a href="#">Donate</a></li>
+          <li><a href="#">Volunteer</a></li>
+          <li><a href="#">Corporate Giving</a></li>
+          <li><a href="#">Annual Reports</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-advocate">
+      <p class="advocate-phrase">
+        Advocated by <strong>Elaine</strong> &ensp;—&ensp;
+        "Every student deserves to be seen. That is not an aspiration. It is a right."
+      </p>
+      <div class="advocate-title">Elaine &ensp;·&ensp; IMU Advisory Board Member</div>
+    </div>
+
+    <div class="footer-base">
+      <span>© 2026 Inspiring Multicultural Understanding &ensp;·&ensp; 501(c)(3) Nonprofit</span>
+      <span>Every Voice. Every Story. Every School.</span>
+    </div>
+  </footer>
+
+</body>
+</html>

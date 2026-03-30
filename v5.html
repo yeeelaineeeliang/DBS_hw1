@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMU — Every Student Deserves to Be Seen 👀</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow:   #ffe033;
+      --pink:     #ff5c8a;
+      --blue:     #3a6bff;
+      --green:    #22c97a;
+      --purple:   #9b5de5;
+      --orange:   #ff7a1a;
+      --sky:      #d6eeff;
+      --lavender: #ede5ff;
+      --mint:     #d4f7e7;
+      --peach:    #ffe8d0;
+      --lemon:    #fff8cc;
+      --ink:      #1a1028;
+      --body-bg:  #fffdf7;
+    }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+    body {
+      background: var(--body-bg);
+      color: var(--ink);
+      font-family: 'Nunito', 'Arial Rounded MT Bold', Arial, sans-serif;
+      line-height: 1.55;
+      overflow-x: hidden;
+    }
+
+    /* ── SQUIGGLE SVG HELPERS ── */
+    .squiggle-underline {
+      text-decoration: none;
+      position: relative;
+      display: inline;
+    }
+    .squiggle-underline::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      bottom: -.15em;
+      height: .35em;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 12' preserveAspectRatio='none'%3E%3Cpath d='M0,8 Q12.5,0 25,8 Q37.5,16 50,8 Q62.5,0 75,8 Q87.5,16 100,8' stroke='%23ffe033' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100% no-repeat;
+    }
+
+    /* ── STICKER SHAPE ── */
+    .sticker {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .35rem;
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      border-radius: 100px;
+      padding: .4rem 1rem;
+      border: 2.5px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .9rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      gap: 1rem;
+    }
+
+    .nav-logo {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--yellow);
+      text-decoration: none;
+      letter-spacing: -.01em;
+    }
+
+    .nav-logo span { color: var(--pink); }
+
+    .nav-pills {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-pill {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      color: rgba(255,255,255,.65);
+      text-decoration: none;
+      padding: .35rem .9rem;
+      border-radius: 100px;
+      transition: background .15s, color .15s;
+    }
+
+    .nav-pill:hover {
+      background: rgba(255,255,255,.12);
+      color: #fff;
+    }
+
+    .nav-btn {
+      font-family: 'Nunito', sans-serif;
+      font-size: .75rem;
+      font-weight: 900;
+      letter-spacing: .04em;
+      color: var(--ink);
+      background: var(--yellow);
+      text-decoration: none;
+      padding: .5rem 1.2rem;
+      border-radius: 100px;
+      border: 2px solid var(--ink);
+      box-shadow: 3px 3px 0 rgba(255,255,255,.2);
+      transition: transform .1s, box-shadow .1s;
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 3px 5px 0 rgba(255,255,255,.2);
+    }
+
+    /* ── TAPE STRIPS ── */
+    .tape {
+      display: inline-block;
+      background: rgba(255,224,51,.55);
+      padding: .1rem .7rem;
+      transform: rotate(-1.5deg);
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--yellow);
+      border-bottom: 3px solid var(--ink);
+      padding: 4.5rem 2rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* background doodle dots */
+    .hero::before {
+      content: '✦ ◆ ● ✦ ◆ ● ✦ ◆ ● ✦ ◆ ●';
+      position: absolute;
+      top: 1rem; right: 2rem;
+      font-size: 1rem;
+      color: rgba(0,0,0,.08);
+      letter-spacing: 1.2rem;
+      word-spacing: 1rem;
+      line-height: 2.2;
+      pointer-events: none;
+      max-width: 340px;
+      text-align: right;
+    }
+
+    .hero-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-tag-row {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 8vw, 5.8rem);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -.02em;
+      color: var(--ink);
+      margin-bottom: 1.6rem;
+    }
+
+    .hero-split {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 3rem;
+      align-items: end;
+    }
+
+    @media (max-width: 680px) {
+      .hero-split { grid-template-columns: 1fr; }
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: rgba(26,16,40,.7);
+      max-width: 480px;
+      line-height: 1.65;
+    }
+
+    .hero-cta-stack {
+      display: flex;
+      flex-direction: column;
+      gap: .7rem;
+      align-items: flex-start;
+    }
+
+    /* main CTA button */
+    .btn-big {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: .02em;
+      text-decoration: none;
+      padding: .9rem 2.2rem;
+      border-radius: 100px;
+      border: 3px solid var(--ink);
+      display: inline-block;
+      transition: transform .12s, box-shadow .12s;
+    }
+
+    .btn-big:hover { transform: translateY(-3px); }
+    .btn-big:active { transform: translateY(1px); }
+
+    .btn-pink  { background: var(--pink);   color: #fff;       box-shadow: 5px 5px 0 var(--ink); }
+    .btn-blue  { background: var(--blue);   color: #fff;       box-shadow: 5px 5px 0 var(--ink); }
+    .btn-green { background: var(--green);  color: var(--ink); box-shadow: 5px 5px 0 var(--ink); }
+    .btn-invert{ background: var(--ink);    color: var(--yellow); box-shadow: 5px 5px 0 rgba(0,0,0,.25); }
+
+    .btn-pink:hover  { box-shadow: 7px 7px 0 var(--ink); }
+    .btn-blue:hover  { box-shadow: 7px 7px 0 var(--ink); }
+    .btn-green:hover { box-shadow: 7px 7px 0 var(--ink); }
+    .btn-invert:hover{ box-shadow: 7px 7px 0 rgba(0,0,0,.35); }
+
+    .hero-note {
+      font-size: .78rem;
+      font-weight: 600;
+      color: rgba(26,16,40,.5);
+    }
+
+    /* ── MARQUEE STRIP ── */
+    .marquee-strip {
+      background: var(--pink);
+      border-top: 3px solid var(--ink);
+      border-bottom: 3px solid var(--ink);
+      padding: .7rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .marquee-inner {
+      display: inline-flex;
+      gap: 2.5rem;
+      animation: scroll-left 22s linear infinite;
+    }
+
+    .marquee-inner span {
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .marquee-inner .dot {
+      color: rgba(255,255,255,.5);
+    }
+
+    @keyframes scroll-left {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── STATS BAND ── */
+    .stats-band {
+      background: var(--ink);
+      padding: 3rem 2rem;
+    }
+
+    .stats-grid {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 1.2rem 1rem;
+      border-right: 1px solid rgba(255,255,255,.1);
+    }
+
+    .stat-card:last-child { border-right: none; }
+
+    .stat-num {
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -.03em;
+    }
+
+    .stat-lbl {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.45);
+      margin-top: .5rem;
+    }
+
+    .c-yellow  { color: var(--yellow); }
+    .c-pink    { color: var(--pink); }
+    .c-green   { color: var(--green); }
+    .c-purple  { color: #c084fc; }
+
+    /* ── SECTIONS GENERIC ── */
+    .section {
+      padding: 5.5rem 2rem;
+    }
+
+    .section-inner {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+
+    .section-h {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      margin-bottom: 1rem;
+    }
+
+    /* ── MISSION ── */
+    .mission-bg {
+      background: var(--lavender);
+      border-top: 3px solid var(--ink);
+      border-bottom: 3px solid var(--ink);
+    }
+
+    .mission-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    @media (max-width: 700px) {
+      .mission-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+    }
+
+    .mission-body {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: rgba(26,16,40,.72);
+      line-height: 1.75;
+    }
+
+    .mission-body + .mission-body { margin-top: 1em; }
+
+    /* pillar cards */
+    .pillar-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .pillar-card {
+      border-radius: 1.2rem;
+      border: 2.5px solid var(--ink);
+      padding: 1.2rem 1.4rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      box-shadow: 4px 4px 0 var(--ink);
+      background: var(--body-bg);
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .pillar-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 4px 7px 0 var(--ink);
+    }
+
+    .pillar-icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      line-height: 1;
+      margin-top: .1rem;
+    }
+
+    .pillar-title {
+      font-size: .82rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: .25rem;
+    }
+
+    .pillar-body {
+      font-size: .9rem;
+      font-weight: 600;
+      color: rgba(26,16,40,.6);
+      line-height: 1.6;
+    }
+
+    /* ── TESTIMONIALS ── */
+    .voices-bg {
+      background: var(--mint);
+      border-bottom: 3px solid var(--ink);
+    }
+
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 800px) {
+      .testi-grid { grid-template-columns: 1fr; }
+    }
+
+    .testi-card {
+      border: 2.5px solid var(--ink);
+      border-radius: 1.5rem;
+      padding: 1.8rem 1.6rem 1.5rem;
+      background: #fff;
+      box-shadow: 5px 5px 0 var(--ink);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      position: relative;
+    }
+
+    .testi-card:nth-child(1) { transform: rotate(-.6deg); }
+    .testi-card:nth-child(2) { transform: rotate(.4deg); }
+    .testi-card:nth-child(3) { transform: rotate(-.3deg); }
+
+    .testi-emoji {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .testi-text {
+      font-size: .97rem;
+      font-weight: 600;
+      color: rgba(26,16,40,.75);
+      line-height: 1.7;
+      flex: 1;
+    }
+
+    .testi-footer {
+      border-top: 2px dashed var(--faint, #e0e0e0);
+      padding-top: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .testi-avatar {
+      width: 2.6rem;
+      height: 2.6rem;
+      border-radius: 50%;
+      border: 2.5px solid var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    .testi-av1 { background: var(--yellow); }
+    .testi-av2 { background: var(--sky); }
+    .testi-av3 { background: var(--peach); }
+
+    .testi-name {
+      font-size: .82rem;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    .testi-role {
+      font-size: .72rem;
+      font-weight: 600;
+      color: rgba(26,16,40,.45);
+      margin-top: .1rem;
+    }
+
+    /* ── BIG QUOTE BAND ── */
+    .quote-band {
+      background: var(--blue);
+      border-top: 3px solid var(--ink);
+      border-bottom: 3px solid var(--ink);
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .quote-band blockquote {
+      font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.3;
+      max-width: 800px;
+      margin: 0 auto;
+      letter-spacing: -.01em;
+    }
+
+    .quote-band blockquote em {
+      font-style: normal;
+      background: var(--yellow);
+      color: var(--ink);
+      padding: .05em .2em;
+      border-radius: .3em;
+      display: inline;
+    }
+
+    .quote-band .q-attr {
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.5);
+      margin-top: 1.5rem;
+    }
+
+    /* ── DONATE ── */
+    .donate-bg {
+      background: var(--lemon);
+      border-bottom: 3px solid var(--ink);
+    }
+
+    .donate-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    @media (max-width: 700px) {
+      .donate-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+    }
+
+    .donate-h {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      margin-bottom: 1rem;
+    }
+
+    .donate-sub {
+      font-size: 1rem;
+      font-weight: 600;
+      color: rgba(26,16,40,.65);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .donate-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: .8rem;
+      align-items: flex-start;
+    }
+
+    /* Impact cards */
+    .impact-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .impact-card {
+      border: 2.5px solid var(--ink);
+      border-radius: 1.2rem;
+      padding: 1.3rem 1.2rem;
+      background: #fff;
+      box-shadow: 4px 4px 0 var(--ink);
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .impact-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 4px 7px 0 var(--ink);
+    }
+
+    .impact-amt {
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: -.02em;
+      line-height: 1;
+      margin-bottom: .4rem;
+    }
+
+    .impact-desc {
+      font-size: .82rem;
+      font-weight: 600;
+      color: rgba(26,16,40,.6);
+      line-height: 1.5;
+    }
+
+    .ic-1 { background: var(--sky); }
+    .ic-2 { background: var(--peach); }
+    .ic-3 { background: var(--mint); }
+    .ic-4 { background: var(--lavender); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      padding: 3.5rem 2rem 2.5rem;
+    }
+
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .footer-top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      margin-bottom: 2rem;
+    }
+
+    .footer-brand .f-logo {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--yellow);
+      letter-spacing: -.01em;
+    }
+
+    .footer-brand .f-logo span { color: var(--pink); }
+
+    .footer-brand .f-tagline {
+      font-size: .82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.4);
+      margin-top: .4rem;
+      max-width: 200px;
+      line-height: 1.5;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem 1rem;
+    }
+
+    .footer-links a {
+      font-size: .78rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.45);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .footer-links a:hover { color: var(--yellow); }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-advocate {
+      font-size: .82rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.38);
+      font-style: italic;
+    }
+
+    .footer-advocate strong {
+      color: rgba(255,255,255,.65);
+      font-style: normal;
+    }
+
+    .footer-copy {
+      font-size: .72rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.2);
+      letter-spacing: .06em;
+    }
+
+    /* ── RESPONSIVE NAV ── */
+    @media (max-width: 540px) {
+      .nav-pills { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav>
+    <a href="#" class="nav-logo">IMU<span>!</span></a>
+    <div class="nav-pills">
+      <a href="#mission" class="nav-pill">Mission</a>
+      <a href="#voices" class="nav-pill">Stories</a>
+      <a href="#donate" class="nav-pill">Impact</a>
+    </div>
+    <a href="#donate" class="nav-btn">💛 Donate</a>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-inner">
+
+      <div class="hero-tag-row">
+        <span class="sticker" style="background:var(--pink);color:#fff;">🌍 Youth Nonprofit</span>
+        <span class="sticker" style="background:#fff;">✦ Est. 2014</span>
+        <span class="sticker" style="background:var(--blue);color:#fff;">🎙️ 12 years strong</span>
+      </div>
+
+      <h1>Every student<br>deserves to be<br><span class="squiggle-underline">seen.</span></h1>
+
+      <div class="hero-split">
+        <p class="hero-sub">
+          IMU — Inspiring Multicultural Understanding — is a youth nonprofit helping
+          students have real, honest conversations about culture and race in schools.
+          Because when every voice is in the room, everyone learns better. 🙌
+        </p>
+        <div class="hero-cta-stack">
+          <a href="#donate" class="btn-big btn-pink">💛 Donate Now</a>
+          <a href="#mission" class="btn-big btn-blue">Learn More ↓</a>
+          <p class="hero-note">100% goes to youth programs</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── MARQUEE ── -->
+  <div class="marquee-strip" aria-hidden="true">
+    <div class="marquee-inner">
+      <span>Every Voice Matters</span><span class="dot">★</span>
+      <span>Open Dialogue</span><span class="dot">★</span>
+      <span>Student Led</span><span class="dot">★</span>
+      <span>4,200+ Students</span><span class="dot">★</span>
+      <span>38 Schools</span><span class="dot">★</span>
+      <span>Youth Power</span><span class="dot">★</span>
+      <span>Culture &amp; Race</span><span class="dot">★</span>
+      <span>Be Seen ✦</span><span class="dot">★</span>
+      <span>Every Voice Matters</span><span class="dot">★</span>
+      <span>Open Dialogue</span><span class="dot">★</span>
+      <span>Student Led</span><span class="dot">★</span>
+      <span>4,200+ Students</span><span class="dot">★</span>
+      <span>38 Schools</span><span class="dot">★</span>
+      <span>Youth Power</span><span class="dot">★</span>
+      <span>Culture &amp; Race</span><span class="dot">★</span>
+      <span>Be Seen ✦</span><span class="dot">★</span>
+    </div>
+  </div>
+
+  <!-- ── STATS ── -->
+  <div class="stats-band" id="impact">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num c-yellow">4,200+</div>
+        <div class="stat-lbl">Students reached</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num c-pink">38</div>
+        <div class="stat-lbl">Partner schools</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num c-green">12</div>
+        <div class="stat-lbl">Years active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num c-purple">94%</div>
+        <div class="stat-lbl">Feel more understood</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MISSION ── -->
+  <section class="section mission-bg" id="mission">
+    <div class="section-inner">
+      <div class="mission-layout">
+        <div>
+          <div class="section-tag" style="color:var(--purple);">✦ Who We Are</div>
+          <h2 class="section-h">We're building something<br>real in classrooms. 💬</h2>
+          <p class="mission-body">
+            IMU creates brave spaces where students can actually talk about identity,
+            culture, and race — not just read about it. No scripts, no filters. Just
+            real students and real conversations.
+          </p>
+          <p class="mission-body" style="margin-top:1em;">
+            We train young people to lead these circles themselves — because students
+            listen to students. And when every story gets heard, every student thrives.
+          </p>
+
+          <div style="margin-top:2rem;padding:1.4rem 1.6rem;background:#fff;border-radius:1.2rem;border:2.5px solid var(--ink);box-shadow:4px 4px 0 var(--ink);">
+            <p style="font-size:1rem;font-weight:700;color:var(--ink);line-height:1.65;">
+              🗣️ <em>"We don't hand students a curriculum. We ask them what they need — then we build it together."</em>
+            </p>
+            <p style="font-size:.78rem;font-weight:700;color:rgba(26,16,40,.4);margin-top:.6rem;letter-spacing:.06em;text-transform:uppercase;">— IMU Program Director</p>
+          </div>
+        </div>
+
+        <div class="pillar-stack">
+          <div class="pillar-card" style="background:var(--lemon);">
+            <span class="pillar-icon">🗣️</span>
+            <div>
+              <div class="pillar-title">Open Dialogue</div>
+              <p class="pillar-body">Safe spaces for honest convos about race, culture, and identity — built on trust.</p>
+            </div>
+          </div>
+          <div class="pillar-card" style="background:var(--sky);">
+            <span class="pillar-icon">🎤</span>
+            <div>
+              <div class="pillar-title">Student Voice</div>
+              <p class="pillar-body">Programs designed by students, for students. Their lived experience is the curriculum.</p>
+            </div>
+          </div>
+          <div class="pillar-card" style="background:var(--peach);">
+            <span class="pillar-icon">🤝</span>
+            <div>
+              <div class="pillar-title">School Partnerships</div>
+              <p class="pillar-body">We work with educators to make inclusion a permanent part of school culture.</p>
+            </div>
+          </div>
+          <div class="pillar-card" style="background:var(--mint);">
+            <span class="pillar-icon">🌱</span>
+            <div>
+              <div class="pillar-title">Youth Leadership</div>
+              <p class="pillar-body">Students become facilitators — and carry the work forward in their own communities.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TESTIMONIALS ── -->
+  <section class="section voices-bg" id="voices">
+    <div class="section-inner">
+      <div class="section-tag" style="color:var(--green);">💬 Real Stories</div>
+      <h2 class="section-h" style="margin-bottom:2.5rem;">
+        Straight from the students. 👇
+      </h2>
+
+      <div class="testi-grid">
+
+        <div class="testi-card">
+          <span class="testi-emoji">🥹</span>
+          <p class="testi-text">
+            "Before IMU, I never talked about being biracial at school. I thought
+            no one would get it. In my first dialogue circle, a girl I barely knew
+            started crying because she felt the exact same way. We became best friends.
+            That's what IMU does."
+          </p>
+          <div class="testi-footer">
+            <div class="testi-avatar testi-av1">M</div>
+            <div>
+              <div class="testi-name">Maya R., 17</div>
+              <div class="testi-role">Student Participant · Chicago, IL</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card">
+          <span class="testi-emoji">✊</span>
+          <p class="testi-text">
+            "I grew up in a mostly white school and never saw my culture reflected
+            anywhere. IMU was the first time my language, my food, my traditions
+            were spoken about with real respect. I finally felt like I belonged —
+            not despite who I am, but because of it."
+          </p>
+          <div class="testi-footer">
+            <div class="testi-avatar testi-av2">J</div>
+            <div>
+              <div class="testi-name">Javier M., 16</div>
+              <div class="testi-role">Student Leader · Los Angeles, CA</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card">
+          <span class="testi-emoji">💫</span>
+          <p class="testi-text">
+            "I used to be afraid to bring up race in class. IMU trained me to lead
+            conversations I once avoided. Now I run dialogue circles at my own
+            school. This program didn't just change my school — it changed who I am."
+          </p>
+          <div class="testi-footer">
+            <div class="testi-avatar testi-av3">A</div>
+            <div>
+              <div class="testi-name">Aisha T., 18</div>
+              <div class="testi-role">Youth Facilitator · Atlanta, GA</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── QUOTE BAND ── -->
+  <div class="quote-band">
+    <blockquote>
+      "A student who feels <em>unseen</em> cannot learn.
+      Cannot lead. Cannot become who they were meant to be."
+    </blockquote>
+    <p class="q-attr">— IMU Mission Statement</p>
+  </div>
+
+  <!-- ── DONATE ── -->
+  <section class="section donate-bg" id="donate">
+    <div class="section-inner">
+      <div class="donate-layout">
+        <div>
+          <div class="section-tag" style="color:var(--orange);">💛 Support Us</div>
+          <h2 class="donate-h">Help every student<br>feel seen. 🙌</h2>
+          <p class="donate-sub">
+            Your gift funds dialogue circles, trains youth facilitators, and gets
+            IMU into schools that need it most. No student should have to navigate
+            belonging alone — not one.
+          </p>
+          <div class="donate-btn-group">
+            <a href="#" class="btn-big btn-pink">💛 Donate Now</a>
+            <a href="#" class="btn-big btn-invert">Volunteer →</a>
+          </div>
+          <p style="font-size:.78rem;font-weight:600;color:rgba(26,16,40,.4);margin-top:1.2rem;">
+            501(c)(3) nonprofit · All donations are tax-deductible
+          </p>
+        </div>
+
+        <div>
+          <div class="section-tag" style="color:var(--blue);">✦ Your $ at Work</div>
+          <div class="impact-cards">
+            <div class="impact-card ic-1">
+              <div class="impact-amt">$25</div>
+              <p class="impact-desc">Supplies one student with a semester of dialogue materials.</p>
+            </div>
+            <div class="impact-card ic-2">
+              <div class="impact-amt">$100</div>
+              <p class="impact-desc">Funds a full dialogue circle for up to 15 students.</p>
+            </div>
+            <div class="impact-card ic-3">
+              <div class="impact-amt">$250</div>
+              <p class="impact-desc">Sponsors a youth facilitator through leadership training.</p>
+            </div>
+            <div class="impact-card ic-4">
+              <div class="impact-amt">$1K</div>
+              <p class="impact-desc">Brings IMU into a new school for an entire semester.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top-row">
+        <div class="footer-brand">
+          <div class="f-logo">IMU<span>!</span></div>
+          <div class="f-tagline">Inspiring Multicultural Understanding</div>
+        </div>
+        <div class="footer-links">
+          <a href="#">About</a>
+          <a href="#">Programs</a>
+          <a href="#">Schools</a>
+          <a href="#">Volunteer</a>
+          <a href="#">Contact</a>
+          <a href="#">Annual Report</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-advocate">
+          Advocated by <strong>Elaine</strong>, IMU Advisory Board Member.
+        </p>
+        <p class="footer-copy">© 2026 IMU · 501(c)(3) Nonprofit</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
