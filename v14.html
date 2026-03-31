@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMU — You Belong Here Too</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Open+Sans:wght@300;400;500;600;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:      #2ea3f2;
+      --blue-dk:   #389cd8;
+      --blue-lt:   #e8f4fd;
+      --blue-pale: #f0f8ff;
+      --orange:    #ed8532;
+      --orange-lt: #fef3e8;
+      --orange-dk: #c96a1a;
+      --text:      #333333;
+      --muted:     #666666;
+      --quiet:     #999999;
+      --border:    #e2e2e2;
+      --white:     #ffffff;
+      --warm-bg:   #fafbfc;
+    }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { background: var(--warm-bg); color: var(--text); font-family: 'Open Sans', Arial, sans-serif; line-height: 1.7; overflow-x: hidden; }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--white);
+      padding: .9rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 200;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 8px rgba(0,0,0,.06);
+    }
+    .nav-brand { display: flex; align-items: center; gap: .9rem; }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--blue-dk); }
+    .nav-sep { width: 1px; height: 24px; background: var(--border); }
+    .nav-full { font-size: .75rem; color: var(--muted); font-weight: 500; }
+    .nav-links { display: flex; gap: 1.8rem; align-items: center; }
+    .nav-links a { font-size: .83rem; font-weight: 500; color: var(--muted); text-decoration: none; transition: color .2s; }
+    .nav-links a:hover { color: var(--blue); }
+    .btn-orange { background: var(--orange); color: var(--white); padding: .5rem 1.3rem; border-radius: 36px; font-weight: 700; font-size: .83rem; text-decoration: none; transition: background .2s; }
+    .btn-orange:hover { background: var(--orange-dk); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 5.5rem 3rem 5rem;
+      background: var(--white);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .hero-text {}
+    .hero-eyebrow { font-size: .72rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--orange); margin-bottom: 1rem; }
+    .hero-h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 700; line-height: 1.2; color: var(--text); margin-bottom: 1.2rem; }
+    .hero-h1 em { font-style: italic; color: var(--blue-dk); }
+    .hero-body { font-size: .95rem; color: var(--muted); line-height: 1.85; margin-bottom: 2rem; max-width: 440px; }
+    .hero-cta { display: flex; gap: .9rem; align-items: center; flex-wrap: wrap; }
+    .btn-big { background: var(--orange); color: var(--white); padding: .85rem 2.2rem; border-radius: 36px; font-weight: 700; font-size: .98rem; text-decoration: none; transition: background .2s, transform .15s; }
+    .btn-big:hover { background: var(--orange-dk); transform: translateY(-1px); }
+    .btn-outline { color: var(--blue); border: 2px solid var(--blue); padding: .85rem 2.2rem; border-radius: 36px; font-weight: 600; font-size: .98rem; text-decoration: none; transition: background .2s, color .2s; }
+    .btn-outline:hover { background: var(--blue); color: var(--white); }
+    .hero-stats { margin-top: 2.5rem; display: flex; gap: 2.5rem; }
+    .hstat-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--blue-dk); line-height: 1; }
+    .hstat-lbl { font-size: .7rem; color: var(--quiet); text-transform: uppercase; letter-spacing: .1em; margin-top: .2rem; }
+
+    .hero-visual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: .7rem;
+    }
+    .scene {
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .scene-tall { grid-row: span 2; }
+    .scene-a {
+      height: 260px;
+      background: linear-gradient(160deg, #389cd8 0%, #2ea3f2 45%, #7cc4f5 100%);
+      display: flex; align-items: flex-end; padding: 1rem;
+    }
+    .scene-b {
+      height: 120px;
+      background: linear-gradient(135deg, #ed8532 0%, #f5a55e 100%);
+    }
+    .scene-c {
+      height: 120px;
+      background: linear-gradient(135deg, #1a7ab8 0%, #389cd8 60%, #2ea3f2 100%);
+    }
+    .scene-caption { font-size: .72rem; color: rgba(255,255,255,.85); font-weight: 500; font-style: italic; }
+
+    /* ── QUOTE BAND ── */
+    .quote-band {
+      background: var(--blue-lt);
+      border-top: 3px solid var(--blue);
+      border-bottom: 3px solid var(--blue);
+      padding: 2.5rem 3rem;
+      text-align: center;
+    }
+    .quote-band blockquote { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1.1rem, 2vw, 1.5rem); color: var(--blue-mid, #1a7ab8); max-width: 740px; margin: 0 auto .7rem; line-height: 1.6; }
+    .quote-band cite { font-size: .8rem; color: var(--muted); font-style: normal; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; }
+
+    /* ── TIMELINE ── */
+    .tl-section { background: var(--warm-bg); }
+    .tl-wrap { max-width: 880px; margin: 0 auto; padding: 5rem 2rem; }
+    .sec-eyebrow { font-size: .7rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--orange); margin-bottom: .5rem; }
+    .sec-title { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; color: var(--text); margin-bottom: 3rem; }
+    .sec-title em { color: var(--blue-dk); font-style: italic; }
+
+    .tl { position: relative; }
+    .tl::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--blue) 0%, var(--blue-dk) 60%, var(--orange) 100%);
+      transform: translateX(-50%);
+    }
+    .tl-item {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr;
+      margin-bottom: 2.5rem;
+      align-items: start;
+    }
+    .tl-left { padding-right: 2rem; text-align: right; }
+    .tl-right { padding-left: 2rem; }
+    .tl-spacer { position: relative; display: flex; justify-content: center; }
+    .tl-dot {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 3px solid var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; font-weight: 700; color: var(--blue-dk);
+      box-shadow: 0 0 0 5px var(--warm-bg);
+      position: relative; z-index: 2; flex-shrink: 0;
+    }
+    .tl-dot.accent { border-color: var(--orange); color: var(--orange); }
+    .tl-dot.now { background: var(--blue); color: var(--white); border-color: var(--blue); width: 52px; height: 52px; font-size: 1rem; box-shadow: 0 0 0 6px rgba(46,163,242,.15); }
+    .tl-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.4rem 1.6rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,.04);
+      transition: box-shadow .2s;
+    }
+    .tl-card:hover { box-shadow: 0 6px 24px rgba(46,163,242,.12); }
+    .tl-year { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--orange); margin-bottom: .3rem; }
+    .tl-name { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: .4rem; }
+    .tl-desc { font-size: .87rem; color: var(--muted); line-height: 1.75; }
+    .tl-pill { display: inline-block; margin-top: .6rem; font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: var(--blue-lt); color: var(--blue-dk); padding: .18rem .55rem; border-radius: 20px; }
+    .tl-pill.warm { background: var(--orange-lt); color: var(--orange-dk); }
+
+    /* hide empty cells */
+    .tl-item.right .tl-left { visibility: hidden; }
+    .tl-item.left .tl-right { visibility: hidden; }
+
+    /* ── TESTIMONIALS ── */
+    .voices { background: var(--white); }
+    .voices-wrap { max-width: 880px; margin: 0 auto; padding: 5rem 2rem; }
+    .voices-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.4rem; margin-top: 2rem; }
+    .voice-card {
+      border-radius: 10px;
+      background: var(--warm-bg);
+      border: 1px solid var(--border);
+      padding: 1.8rem 1.6rem;
+      position: relative;
+    }
+    .voice-card::before {
+      content: '"';
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      color: var(--blue-lt);
+      position: absolute;
+      top: .2rem; left: 1.1rem;
+      line-height: 1;
+    }
+    .voice-q { font-style: italic; font-size: .93rem; color: var(--text); line-height: 1.8; margin-bottom: 1.2rem; padding-top: 1.8rem; position: relative; z-index: 1; }
+    .voice-hr { height: 1px; background: var(--border); margin-bottom: .8rem; }
+    .voice-name { font-size: .88rem; font-weight: 700; color: var(--text); }
+    .voice-loc { font-size: .78rem; color: var(--muted); margin-top: .1rem; }
+
+    /* ── WAYS TO JOIN ── */
+    .join { background: var(--blue-pale); }
+    .join-wrap { max-width: 880px; margin: 0 auto; padding: 5rem 2rem; }
+    .join-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.4rem; margin-top: 2rem; }
+    .jcard {
+      background: var(--white);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 2rem 1.8rem;
+      text-align: center;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .jcard:hover { box-shadow: 0 8px 30px rgba(46,163,242,.13); transform: translateY(-3px); }
+    .jcard.top { border-top: 4px solid var(--orange); }
+    .jcard-num { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; color: var(--blue-lt); line-height: 1; margin-bottom: .5rem; }
+    .jcard-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: .7rem; }
+    .jcard-desc { font-size: .87rem; color: var(--muted); line-height: 1.75; margin-bottom: 1.4rem; }
+    .btn-sm-orange { display: inline-block; background: var(--orange); color: var(--white); padding: .6rem 1.5rem; border-radius: 36px; font-size: .83rem; font-weight: 700; text-decoration: none; transition: background .2s; }
+    .btn-sm-orange:hover { background: var(--orange-dk); }
+    .btn-sm-blue { display: inline-block; border: 2px solid var(--blue); color: var(--blue); padding: .6rem 1.5rem; border-radius: 36px; font-size: .83rem; font-weight: 700; text-decoration: none; transition: background .2s, color .2s; }
+    .btn-sm-blue:hover { background: var(--blue); color: var(--white); }
+
+    /* ── DONATE ── */
+    .donate { background: var(--blue-dk); color: var(--white); }
+    .donate-wrap { max-width: 880px; margin: 0 auto; padding: 5rem 2rem; text-align: center; }
+    .donate-eyebrow { font-size: .7rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--orange); margin-bottom: .6rem; }
+    .donate-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 700; color: var(--white); margin-bottom: .6rem; }
+    .donate-title em { font-style: italic; color: rgba(255,255,255,.75); }
+    .donate-sub { color: rgba(255,255,255,.7); font-size: .95rem; margin-bottom: 3rem; max-width: 520px; margin-left: auto; margin-right: auto; }
+    .tiers { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-bottom: 2.5rem; }
+    .tier {
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 1.8rem 1rem;
+      transition: background .2s, transform .2s;
+    }
+    .tier:hover { background: rgba(255,255,255,.13); transform: translateY(-2px); }
+    .tier.best { border-color: var(--orange); background: rgba(237,133,50,.1); }
+    .tier-amt { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--orange); }
+    .tier-name { font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.5); margin: .3rem 0 .5rem; }
+    .tier-desc { font-size: .82rem; color: rgba(255,255,255,.75); line-height: 1.6; }
+    .btn-donate { display: inline-block; background: var(--orange); color: var(--white); padding: 1rem 3rem; border-radius: 36px; font-size: 1rem; font-weight: 700; text-decoration: none; transition: background .2s, transform .15s; }
+    .btn-donate:hover { background: var(--orange-dk); transform: translateY(-2px); }
+
+    /* ── FOOTER ── */
+    footer { background: #111; color: rgba(255,255,255,.6); padding: 3rem 2rem; text-align: center; }
+    .ft-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--white); }
+    .ft-links { display: flex; gap: 2rem; justify-content: center; margin: 1rem 0; flex-wrap: wrap; }
+    .ft-links a { color: rgba(255,255,255,.5); text-decoration: none; font-size: .82rem; transition: color .2s; }
+    .ft-links a:hover { color: var(--blue); }
+    .ft-elaine { font-style: italic; font-size: .88rem; color: rgba(255,255,255,.45); margin-top: 1rem; }
+    .ft-copy { font-size: .75rem; color: rgba(255,255,255,.28); margin-top: .4rem; }
+
+    @media (max-width: 768px) {
+      nav { padding: .8rem 1.2rem; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; padding: 3rem 1.5rem; gap: 2.5rem; }
+      .hero-visual { display: none; }
+      .tl::before { left: 22px; }
+      .tl-item { grid-template-columns: 50px 1fr; }
+      .tl-left { display: none; }
+      .tl-item.right .tl-left, .tl-item.left .tl-right { visibility: visible; }
+      .tl-spacer { justify-content: flex-start; }
+      .tl-right { padding-left: 1.2rem; }
+      .voices-grid { grid-template-columns: 1fr; }
+      .join-cards { grid-template-columns: 1fr; }
+      .tiers { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">IMU</div>
+    <div class="nav-sep"></div>
+    <div class="nav-full">Inspiring Multicultural Understanding</div>
+  </div>
+  <div class="nav-links">
+    <a href="#story">Our Journey</a>
+    <a href="#voices">Voices</a>
+    <a href="#join">Get Involved</a>
+    <a href="#donate" class="btn-orange">Donate</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section style="background:var(--white); border-bottom:1px solid var(--border);">
+  <div class="hero">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Youth-Led · Est. 2014 · 38 Schools</div>
+      <h1 class="hero-h1">Every Student<br>Deserves <em>to Be Seen</em></h1>
+      <p class="hero-body">IMU is a youth-led nonprofit building empathy and belonging in K–12 schools. Through Peace Clubs, multicultural retreats, and educator workshops, we make sure no student has to translate themselves to fit in.</p>
+      <div class="hero-cta">
+        <a href="#donate" class="btn-big">Donate Today</a>
+        <a href="#join" class="btn-outline">Get Involved</a>
+      </div>
+      <div class="hero-stats">
+        <div><div class="hstat-num">4,200+</div><div class="hstat-lbl">Students</div></div>
+        <div><div class="hstat-num">38</div><div class="hstat-lbl">Schools</div></div>
+        <div><div class="hstat-num">94%</div><div class="hstat-lbl">Feel Understood</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="scene scene-tall scene-a">
+        <span class="scene-caption">Peace Club, Chicago 2024</span>
+      </div>
+      <div class="scene scene-b"></div>
+      <div class="scene scene-c"></div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE BAND -->
+<div class="quote-band">
+  <blockquote>"We believe in a world where every student, regardless of background, walks into school knowing they belong."</blockquote>
+  <cite>— IMU Founding Principle, 2014</cite>
+</div>
+
+<!-- TIMELINE -->
+<section class="tl-section" id="story">
+  <div class="tl-wrap">
+    <div class="sec-eyebrow">Our Journey</div>
+    <h2 class="sec-title">Twelve Years of <em>Belonging</em></h2>
+    <div class="tl">
+
+      <div class="tl-item left">
+        <div class="tl-left">
+          <div class="tl-card">
+            <div class="tl-year">2014</div>
+            <div class="tl-name">IMU Founded</div>
+            <div class="tl-desc">Chicago high schoolers tired of feeling invisible launch IMU. The first Peace Club opens its doors — a place to listen before judging.</div>
+            <span class="tl-pill">Origin Story</span>
+          </div>
+        </div>
+        <div class="tl-spacer"><div class="tl-dot">2014</div></div>
+        <div class="tl-right"></div>
+      </div>
+
+      <div class="tl-item right">
+        <div class="tl-left"></div>
+        <div class="tl-spacer"><div class="tl-dot">2015</div></div>
+        <div class="tl-right">
+          <div class="tl-card">
+            <div class="tl-year">2015</div>
+            <div class="tl-name">First International Day of Peace</div>
+            <div class="tl-desc">300 students across three Chicago schools gather to celebrate difference. A beloved annual tradition is born.</div>
+            <span class="tl-pill">Milestone</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item left">
+        <div class="tl-left">
+          <div class="tl-card">
+            <div class="tl-year">2016</div>
+            <div class="tl-name">Peace Club Network Grows</div>
+            <div class="tl-desc">8 schools, cross-school exchanges, and student-led dialogue sessions. The model proves it can scale.</div>
+            <span class="tl-pill">Growth</span>
+          </div>
+        </div>
+        <div class="tl-spacer"><div class="tl-dot">2016</div></div>
+        <div class="tl-right"></div>
+      </div>
+
+      <div class="tl-item right">
+        <div class="tl-left"></div>
+        <div class="tl-spacer"><div class="tl-dot accent">2018</div></div>
+        <div class="tl-right">
+          <div class="tl-card">
+            <div class="tl-year">2018</div>
+            <div class="tl-name">First Multicultural Retreat</div>
+            <div class="tl-desc">100 students, 12 cultures, one weekend. 94% say they felt more connected to classmates they'd never spoken to before.</div>
+            <span class="tl-pill warm">Impact</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item left">
+        <div class="tl-left">
+          <div class="tl-card">
+            <div class="tl-year">2019</div>
+            <div class="tl-name">Educator Workshop Series</div>
+            <div class="tl-desc">200 teachers complete IMU's culturally responsive practices training in year one. The curriculum enters classrooms.</div>
+            <span class="tl-pill">Education</span>
+          </div>
+        </div>
+        <div class="tl-spacer"><div class="tl-dot">2019</div></div>
+        <div class="tl-right"></div>
+      </div>
+
+      <div class="tl-item right">
+        <div class="tl-left"></div>
+        <div class="tl-spacer"><div class="tl-dot">2020</div></div>
+        <div class="tl-right">
+          <div class="tl-card">
+            <div class="tl-year">2020</div>
+            <div class="tl-name">Going Virtual</div>
+            <div class="tl-desc">Pandemic. Schools close. IMU pivots online in two weeks and reaches students in 5 new cities. Community doesn't need a building.</div>
+            <span class="tl-pill">Resilience</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item left">
+        <div class="tl-left">
+          <div class="tl-card">
+            <div class="tl-year">2022</div>
+            <div class="tl-name">38 Schools. 4,200 Students.</div>
+            <div class="tl-desc">IMU reaches national scale — Los Angeles, Atlanta, Chicago, New York. The numbers prove the need. The stories prove the impact.</div>
+            <span class="tl-pill warm">National Scale</span>
+          </div>
+        </div>
+        <div class="tl-spacer"><div class="tl-dot accent">2022</div></div>
+        <div class="tl-right"></div>
+      </div>
+
+      <div class="tl-item right">
+        <div class="tl-left"></div>
+        <div class="tl-spacer"><div class="tl-dot now">✦</div></div>
+        <div class="tl-right">
+          <div class="tl-card">
+            <div class="tl-year">Today · 2026</div>
+            <div class="tl-name">Your Chapter Begins</div>
+            <div class="tl-desc">12 years of belonging. The next chapter depends on people like you — donors, volunteers, and educators who believe every student deserves to be seen.</div>
+            <span class="tl-pill warm">Now</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="voices" id="voices">
+  <div class="voices-wrap">
+    <div class="sec-eyebrow">Student Voices</div>
+    <h2 class="sec-title">What Belonging <em>Sounds Like</em></h2>
+    <div class="voices-grid">
+      <div class="voice-card">
+        <p class="voice-q">"Before IMU, I ate lunch alone every day for a year. Peace Club changed everything. I finally had people who wanted to know my story, not just where I was from."</p>
+        <div class="voice-hr"></div>
+        <div class="voice-name">Maya R., 17</div>
+        <div class="voice-loc">Chicago, IL · Peace Club Member</div>
+      </div>
+      <div class="voice-card">
+        <p class="voice-q">"IMU taught me that my culture is something to be proud of, not hidden. The retreat was the first time I didn't feel like I had to translate myself for anyone."</p>
+        <div class="voice-hr"></div>
+        <div class="voice-name">Javier M., 16</div>
+        <div class="voice-loc">Los Angeles, CA · Peace Club Leader</div>
+      </div>
+      <div class="voice-card">
+        <p class="voice-q">"I came to IMU's International Day of Peace not knowing anyone. I left with five new friends and a club I now help run. It really is that simple."</p>
+        <div class="voice-hr"></div>
+        <div class="voice-name">Aisha T., 18</div>
+        <div class="voice-loc">Atlanta, GA · Program Graduate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GET INVOLVED -->
+<section class="join" id="join">
+  <div class="join-wrap">
+    <div class="sec-eyebrow">Get Involved</div>
+    <h2 class="sec-title">Three Ways to <em>Join the Story</em></h2>
+    <div class="join-cards">
+      <div class="jcard top">
+        <div class="jcard-num">01</div>
+        <div class="jcard-title">Donate</div>
+        <div class="jcard-desc">Your gift funds Peace Clubs, retreats, and the educators who make belonging possible. Every dollar reaches a real student.</div>
+        <a href="#donate" class="btn-sm-orange">Give Now</a>
+      </div>
+      <div class="jcard">
+        <div class="jcard-num">02</div>
+        <div class="jcard-title">Volunteer</div>
+        <div class="jcard-desc">Become a facilitator, mentor, or workshop leader. Your time and experience are exactly what our students need.</div>
+        <a href="#" class="btn-sm-blue">Learn More</a>
+      </div>
+      <div class="jcard">
+        <div class="jcard-num">03</div>
+        <div class="jcard-title">Partner Your School</div>
+        <div class="jcard-desc">School admins: bring a Peace Club to your campus. We provide training, curriculum, and ongoing support.</div>
+        <a href="#" class="btn-sm-blue">Start Here</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DONATE -->
+<section class="donate" id="donate">
+  <div class="donate-wrap">
+    <div class="donate-eyebrow">Your Gift</div>
+    <h2 class="donate-title">Choose Your <em>Impact</em></h2>
+    <p class="donate-sub">Every contribution funds the programs that help students feel seen. No gift is too small to matter.</p>
+    <div class="tiers">
+      <div class="tier">
+        <div class="tier-amt">$25</div>
+        <div class="tier-name">Supporter</div>
+        <div class="tier-desc">One student's semester of Peace Club materials</div>
+      </div>
+      <div class="tier best">
+        <div class="tier-amt">$100</div>
+        <div class="tier-name">Champion</div>
+        <div class="tier-desc">One student's multicultural retreat experience</div>
+      </div>
+      <div class="tier">
+        <div class="tier-amt">$250</div>
+        <div class="tier-name">Builder</div>
+        <div class="tier-desc">One educator's culturally-responsive workshop</div>
+      </div>
+      <div class="tier">
+        <div class="tier-amt">$1,000</div>
+        <div class="tier-name">Founder</div>
+        <div class="tier-desc">A brand new Peace Club in a school without one</div>
+      </div>
+    </div>
+    <a href="#" class="btn-donate">Donate Now</a>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-logo">IMU</div>
+  <div class="ft-links">
+    <a href="#">About</a>
+    <a href="#">Programs</a>
+    <a href="#">News</a>
+    <a href="#">Volunteer</a>
+    <a href="#">Partner</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="ft-elaine">Advocated by <strong>Elaine</strong>, IMU Advisory Board Member</div>
+  <div class="ft-copy">© 2026 Inspiring Multicultural Understanding · All rights reserved</div>
+</footer>
+
+</body>
+</html>
