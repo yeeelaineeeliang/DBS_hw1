@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMU Landing Page — Design Process Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #2ea3f2;
+    --blue-dk: #1a7fc4;
+    --blue-lt: #e8f5fe;
+    --orange: #ed8532;
+    --orange-lt: #fff5ec;
+    --text: #2e2e2e;
+    --mid: #555;
+    --muted: #888;
+    --bg: #f7f9fc;
+    --white: #fff;
+    --border: #e0e8f0;
+    --shadow: 0 2px 12px rgba(46,163,242,.10);
+    --shadow-md: 0 6px 28px rgba(0,0,0,.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Open Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--white);
+    border-bottom: 2px solid var(--blue);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--blue-dk);
+    text-decoration: none;
+  }
+  .nav-sub {
+    font-size: .75rem;
+    font-weight: 300;
+    color: var(--muted);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .nav-pill {
+    background: var(--orange);
+    color: #fff;
+    padding: .35rem .85rem;
+    border-radius: 20px;
+    font-size: .78rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #1a5c8a 0%, var(--blue) 60%, #5bb8f7 100%);
+    color: #fff;
+    text-align: center;
+    padding: 80px 2rem 64px;
+  }
+  .hero-eyebrow {
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    opacity: .8;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 1.2rem;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: #ffd580;
+  }
+  .hero-desc {
+    max-width: 580px;
+    margin: 0 auto 2rem;
+    font-size: 1.05rem;
+    font-weight: 300;
+    opacity: .9;
+    line-height: 1.7;
+  }
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+  .hero-meta-item {
+    text-align: center;
+  }
+  .hero-meta-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffd580;
+    display: block;
+  }
+  .hero-meta-label {
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    opacity: .75;
+  }
+
+  /* ── PROCESS NARRATIVE ── */
+  .process {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 64px 2rem 48px;
+  }
+  .process-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--blue-dk);
+    margin-bottom: .5rem;
+  }
+  .process-rule {
+    width: 48px;
+    height: 3px;
+    background: var(--orange);
+    border: none;
+    margin-bottom: 1.5rem;
+  }
+  .process p {
+    color: var(--mid);
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+  }
+
+  /* ── PHASE LABELS ── */
+  .phases {
+    max-width: 1120px;
+    margin: 0 auto 0;
+    padding: 0 2rem;
+  }
+  .phase-block {
+    margin-bottom: 56px;
+  }
+  .phase-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    padding-bottom: .75rem;
+    border-bottom: 2px solid var(--border);
+  }
+  .phase-tag {
+    background: var(--blue);
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: .25rem .65rem;
+    border-radius: 4px;
+  }
+  .phase-tag.orange { background: var(--orange); }
+  .phase-tag.green  { background: #38a169; }
+  .phase-tag.final  { background: linear-gradient(90deg, var(--blue-dk), var(--orange)); }
+  .phase-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .phase-range {
+    font-size: .8rem;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  /* ── CARD GRID ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform .18s, box-shadow .18s;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+  .card.final-card {
+    border: 2px solid var(--orange);
+    grid-column: span 2;
+  }
+
+  .card-thumb {
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: rgba(255,255,255,.85);
+    position: relative;
+    overflow: hidden;
+  }
+  .card.final-card .card-thumb { height: 180px; font-size: 4rem; }
+
+  /* Unique gradient per version group */
+  .bg-explore   { background: linear-gradient(135deg, #6b7fad 0%, #9baad4 100%); }
+  .bg-structure { background: linear-gradient(135deg, #2ea3f2 0%, #5bb8f7 100%); }
+  .bg-emotion   { background: linear-gradient(135deg, #1a7fc4 0%, #38a169 100%); }
+  .bg-data      { background: linear-gradient(135deg, #ed8532 0%, #f5a657 100%); }
+  .bg-converge  { background: linear-gradient(135deg, #1a5c8a 0%, #2ea3f2 50%, #ed8532 100%); }
+  .bg-final     { background: linear-gradient(135deg, #1a5c8a 0%, #2ea3f2 40%, #ed8532 80%, #ffd580 100%); }
+
+  .card-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,.35);
+    color: #fff;
+    font-size: .65rem;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .2rem .5rem;
+    border-radius: 3px;
+  }
+  .card-badge.final { background: var(--orange); }
+
+  .card-body {
+    padding: 14px 16px 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .card-version {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--blue);
+  }
+  .card.final-card .card-version { color: var(--orange); }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.25;
+  }
+  .card-desc {
+    font-size: .8rem;
+    color: var(--muted);
+    line-height: 1.55;
+    flex: 1;
+  }
+  .card-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: .75rem;
+    font-weight: 600;
+    color: var(--blue);
+    text-decoration: none;
+  }
+  .card.final-card .card-link { color: var(--orange); }
+  .card-link::after { content: " →"; }
+
+  /* ── REFLECTION ── */
+  .reflection {
+    background: var(--white);
+    border-top: 3px solid var(--blue);
+    margin-top: 64px;
+    padding: 64px 2rem;
+  }
+  .reflection-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .reflection h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--blue-dk);
+    margin-bottom: .5rem;
+  }
+  .reflection-rule {
+    width: 48px;
+    height: 3px;
+    background: var(--orange);
+    border: none;
+    margin-bottom: 2rem;
+  }
+  .q-block {
+    margin-bottom: 2rem;
+    padding-left: 1.25rem;
+    border-left: 3px solid var(--blue-lt);
+  }
+  .q-label {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: .4rem;
+  }
+  .q-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--text);
+    margin-bottom: .6rem;
+  }
+  .q-answer {
+    font-size: .95rem;
+    color: var(--mid);
+    line-height: 1.8;
+  }
+
+  /* ── ADVISORY ── */
+  .advisory-band {
+    background: var(--orange-lt);
+    border-top: 2px solid var(--orange);
+    border-bottom: 2px solid var(--orange);
+    padding: 40px 2rem;
+    text-align: center;
+  }
+  .advisory-inner {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .advisory-eyebrow {
+    font-size: .72rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--orange);
+    font-weight: 700;
+    margin-bottom: .75rem;
+  }
+  .advisory-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.65;
+    margin-bottom: .75rem;
+  }
+  .advisory-attr {
+    font-size: .82rem;
+    color: var(--mid);
+    font-weight: 600;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--text);
+    color: rgba(255,255,255,.6);
+    text-align: center;
+    padding: 32px 2rem;
+    font-size: .8rem;
+    line-height: 1.8;
+  }
+  footer a { color: rgba(255,255,255,.75); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .card.final-card { grid-column: span 1; }
+    .hero-meta { gap: 1.5rem; }
+    .hero { padding: 56px 1.25rem 48px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">IMU · Design Gallery</a>
+  <span class="nav-sub">25 Iterations · Design, Build, Ship</span>
+  <a class="nav-pill" href="v25.html">View Final →</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <p class="hero-eyebrow">Design, Build, Ship — Assignment 1</p>
+  <h1>25 Iterations.<br><em>One story worth telling.</em></h1>
+  <p class="hero-desc">
+    A complete design process for the IMU (Inspiring Multicultural Understanding) landing page — from raw exploration through structured convergence to a final design built to drive donations and community participation.
+  </p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <span class="hero-meta-num">25</span>
+      <span class="hero-meta-label">Versions</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-num">5</span>
+      <span class="hero-meta-label">Phases</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-num">1</span>
+      <span class="hero-meta-label">Final design</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-num">v25</span>
+      <span class="hero-meta-label">Chosen version</span>
+    </div>
+  </div>
+</header>
+
+<!-- PROCESS NARRATIVE -->
+<section class="process">
+  <h2 class="process-title">The Design Process</h2>
+  <hr class="process-rule">
+  <p>
+    This project began with a personal mission: I serve on the advisory board of IMU — Inspiring Multicultural Understanding — a nonprofit that brings empathy and belonging programs to K–12 schools across the country. I wanted to build a landing page that actually moves people to act: to donate, to volunteer, and to connect as school administrators.
+  </p>
+  <p>
+    The 25 versions documented here are not throwaway drafts. Each one was a deliberate experiment — testing a different visual language, information hierarchy, emotional register, or interaction pattern. The first 12 versions (v1–v12) explored broadly: full-screen heroes, editorial layouts, dark cinematic modes, minimalist grids, and data-led designs. Versions 13–19 adopted IMU's actual brand colors and tested layouts purpose-built for a nonprofit advocacy audience. Versions 20–25 converged relentlessly toward the final design, adding features, refining hierarchy, and tightening every typographic and spacing decision.
+  </p>
+  <p>
+    The final design (v25) leads with a donate-first pathway card that is visually dominant, wraps the visitor in the IMU story through a photo timeline with real voices woven in, and adds interactive touches — a sticky donate bar, scroll animations, and an amount chip picker — that reduce friction between intention and action.
+  </p>
+</section>
+
+<!-- PHASE 1: EXPLORATION -->
+<div class="phases">
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <span class="phase-tag">Phase 1</span>
+      <span class="phase-name">Broad Exploration</span>
+      <span class="phase-range">v1 – v6</span>
+    </div>
+    <div class="card-grid">
+
+      <a class="card" href="v1.html">
+        <div class="card-thumb bg-explore">
+          v1
+          <span class="card-badge">Hero-first</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 01</div>
+          <div class="card-title">Classic nonprofit hero</div>
+          <div class="card-desc">Full-viewport headline, tagline, and CTA button. Establishes the IMU story baseline with mission copy and a simple stat row.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v2.html">
+        <div class="card-thumb bg-explore">
+          v2
+          <span class="card-badge">Two-col</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 02</div>
+          <div class="card-title">Split hero, card grid</div>
+          <div class="card-desc">Text left, visual right. Introduces a 3-column program card grid and a first pass at donation tiers below the fold.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v3.html">
+        <div class="card-thumb bg-explore">
+          v3
+          <span class="card-badge">Bold type</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 03</div>
+          <div class="card-title">Editorial typography</div>
+          <div class="card-desc">Large display type as the hero anchor. Tests whether bold text alone — without imagery — can carry emotional weight on a nonprofit page.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v4.html">
+        <div class="card-thumb bg-explore">
+          v4
+          <span class="card-badge">Testimonials</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 04</div>
+          <div class="card-title">Story-led with voices</div>
+          <div class="card-desc">Student testimonials elevated to primary content. Three full-bleed quote blocks build social proof before the donate ask.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v5.html">
+        <div class="card-thumb bg-explore">
+          v5
+          <span class="card-badge">Mosaic</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 05</div>
+          <div class="card-title">Mosaic / magazine grid</div>
+          <div class="card-desc">Asymmetric masonry-inspired hero grid. Tests visual complexity and how much layout energy a nonprofit page can carry before losing clarity.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v6.html">
+        <div class="card-thumb bg-explore">
+          v6
+          <span class="card-badge">Parallax</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 06</div>
+          <div class="card-title">Scrolling sections + sticky nav</div>
+          <div class="card-desc">First version with a scroll-aware nav. Anchored sections for mission, programs, impact, and give. Establishes the sticky-nav pattern carried forward.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- PHASE 2: STRUCTURE -->
+  <div class="phase-block">
+    <div class="phase-header">
+      <span class="phase-tag">Phase 2</span>
+      <span class="phase-name">Structural Experiments</span>
+      <span class="phase-range">v7 – v12</span>
+    </div>
+    <div class="card-grid">
+
+      <a class="card" href="v7.html">
+        <div class="card-thumb bg-structure">
+          v7
+          <span class="card-badge">Timeline</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 07</div>
+          <div class="card-title">Vertical timeline</div>
+          <div class="card-desc">Center-spine vertical timeline as the primary narrative device. Tests whether chronological storytelling builds trust before the donate CTA.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v8.html">
+        <div class="card-thumb bg-structure">
+          v8
+          <span class="card-badge">Pathways</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 08</div>
+          <div class="card-title">Three-pathway layout</div>
+          <div class="card-desc">First introduction of the three-pathway model: Donate / Volunteer / Partner. Identified as the structural prototype closest to the final vision.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v9.html">
+        <div class="card-thumb bg-structure">
+          v9
+          <span class="card-badge">Minimalist</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 09</div>
+          <div class="card-title">Minimal, whitespace-led</div>
+          <div class="card-desc">Radical whitespace. Everything stripped to hairline rules and type. Tests the ceiling of simplicity for an emotionally complex nonprofit message.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v10.html">
+        <div class="card-thumb bg-structure" style="background: linear-gradient(135deg, #0a0806 0%, #1c1408 50%, #e8922a 100%);">
+          v10
+          <span class="card-badge">Cinematic</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 10</div>
+          <div class="card-title">Cinematic dark mode</div>
+          <div class="card-desc">A24-inspired dark mode experiment: deep warm blacks, amber/gold accents, Cormorant Garamond headlines, CSS film grain. A distinct aesthetic outlier.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v11.html">
+        <div class="card-thumb bg-structure">
+          v11
+          <span class="card-badge">Data-led</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 11</div>
+          <div class="card-title">Statistics as hero</div>
+          <div class="card-desc">Impact numbers front-and-center: 4,200+ students, 38 schools, 12 years, 94% feel understood. Tests whether raw data or storytelling better motivates donors.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v12.html">
+        <div class="card-thumb bg-structure">
+          v12
+          <span class="card-badge">Grid</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 12</div>
+          <div class="card-title">Masonry content grid</div>
+          <div class="card-desc">CSS grid masonry for program cards, testimonials, and stats displayed simultaneously. Explores information density vs. cognitive load.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- PHASE 3: IMU BRAND -->
+  <div class="phase-block">
+    <div class="phase-header">
+      <span class="phase-tag orange">Phase 3</span>
+      <span class="phase-name">IMU Brand + Purpose-Built Layouts</span>
+      <span class="phase-range">v13 – v19</span>
+    </div>
+    <div class="card-grid">
+
+      <a class="card" href="v13.html">
+        <div class="card-thumb bg-emotion">
+          v13
+          <span class="card-badge">Brand colors</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 13</div>
+          <div class="card-title">Editorial timeline + IMU blue</div>
+          <div class="card-desc">First version using IMU's actual brand palette (#2ea3f2 blue, #ed8532 orange). Center-spine timeline anchored by Playfair Display headlines.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v14.html">
+        <div class="card-thumb bg-emotion">
+          v14
+          <span class="card-badge">Split hero</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 14</div>
+          <div class="card-title">Warm emotional, split hero</div>
+          <div class="card-desc">Left text / right CSS scene images. Quote band with mission prose. Voices woven into the alternating photo timeline for the first time.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v15.html">
+        <div class="card-thumb bg-emotion">
+          v15
+          <span class="card-badge">Pathways hero</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 15</div>
+          <div class="card-title">Pathways-first hero</div>
+          <div class="card-desc">The three pathway cards ARE the hero. Donate card is widest (1.6fr). Interactive amount chips. First appearance of the donate-dominant grid hierarchy.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v16.html">
+        <div class="card-thumb bg-data" style="background: linear-gradient(135deg, #1a5c8a, #5bb8f7);">
+          v16
+          <span class="card-badge">Photo timeline</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 16</div>
+          <div class="card-title">Photo-forward alternating timeline</div>
+          <div class="card-desc">CSS gradient "scene" images simulate photography in alternating flip layout. Full-viewport hero with radial overlay. Timeline with 5 distinct chapter scenes.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v17.html">
+        <div class="card-thumb bg-data">
+          v17
+          <span class="card-badge">Stat grid</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 17</div>
+          <div class="card-title">Data-led: stat grid as hero</div>
+          <div class="card-desc">Impact stats and animated bar charts open the page. DM Mono labels. Horizontal timeline below. Tests the nonprofit case where numbers alone earn trust.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v18.html">
+        <div class="card-thumb bg-data" style="background: linear-gradient(135deg, #888 0%, #bbb 100%);">
+          v18
+          <span class="card-badge">Minimal</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 18</div>
+          <div class="card-title">Single-column minimal</div>
+          <div class="card-desc">640px max-width column, hairline rules only. Numbered join items in a 1fr/3fr/auto grid. The quietest version — pushes back against visual excess in others.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v19.html">
+        <div class="card-thumb bg-emotion">
+          v19
+          <span class="card-badge">Mosaic</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 19</div>
+          <div class="card-title">Mosaic hero + voices timeline</div>
+          <div class="card-desc">5-tile CSS mosaic hero grid. Center-spine timeline with voices woven in on alternating sides. Richest content density before convergence begins.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- PHASE 4: CONVERGENCE -->
+  <div class="phase-block">
+    <div class="phase-header">
+      <span class="phase-tag green">Phase 4</span>
+      <span class="phase-name">Convergence</span>
+      <span class="phase-range">v20 – v24</span>
+    </div>
+    <div class="card-grid">
+
+      <a class="card" href="v20.html">
+        <div class="card-thumb bg-converge">
+          v20
+          <span class="card-badge">First convergence</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 20</div>
+          <div class="card-title">Pathways hero + photo timeline</div>
+          <div class="card-desc">First true convergence: pathways hero (1.55fr donate dominant) + alternating photo timeline + voices woven in. The skeleton of the final design emerges.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v21.html">
+        <div class="card-thumb bg-converge">
+          v21
+          <span class="card-badge">Hierarchy</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 21</div>
+          <div class="card-title">Refined hero hierarchy</div>
+          <div class="card-desc">Donate card gets warm cream background (#fffcf9) and upward box-shadow to visually lift it. Hover states differentiated per card type. Tighter spacing throughout.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v22.html">
+        <div class="card-thumb bg-converge">
+          v22
+          <span class="card-badge">Programs</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 22</div>
+          <div class="card-title">Programs section + chapter labels</div>
+          <div class="card-desc">Four program cards in 2×2 grid (52px icon col + 1fr content). Timeline chapters labeled I–V. Adds credibility and substantive content depth.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v23.html">
+        <div class="card-thumb bg-converge">
+          v23
+          <span class="card-badge">Testimonials</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 23</div>
+          <div class="card-title">Full testimonials + Elaine advisory</div>
+          <div class="card-desc">Dedicated voices band in IMU blue-mid. Advisory band featuring Elaine (IMU Advisory Board) in orange-lt with orange border — moves from footer credit to prominent placement.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+      <a class="card" href="v24.html">
+        <div class="card-thumb bg-converge">
+          v24
+          <span class="card-badge">Polish</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 24</div>
+          <div class="card-title">Typography polish + shadows</div>
+          <div class="card-desc">Refined CSS variables: richer text (#2e2e2e), shadow tokens. Em-dash decorators on hero eyebrow. Large quote mark via ::before on mission pull. Final pre-production state.</div>
+          <span class="card-link">Open</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- PHASE 5: FINAL -->
+  <div class="phase-block">
+    <div class="phase-header">
+      <span class="phase-tag final">Phase 5</span>
+      <span class="phase-name">Final Design</span>
+      <span class="phase-range">v25</span>
+    </div>
+    <div class="card-grid">
+
+      <a class="card final-card" href="v25.html">
+        <div class="card-thumb bg-final">
+          v25
+          <span class="card-badge final">★ FINAL</span>
+        </div>
+        <div class="card-body">
+          <div class="card-version">Version 25 — Chosen Design</div>
+          <div class="card-title">IMU · Donate-first, story-powered landing page</div>
+          <div class="card-desc">
+            The complete design. Donate-dominant pathway hero (1.7fr grid column), IMU brand palette, Playfair + Open Sans typography. Sticky donate bar activates after 600px scroll. Intersection Observer fade-up scroll animations on all major sections. Interactive amount chip picker with JS onclick selection. CTA bridge section ("The story isn't finished") between journey and donate. Voices band, Elaine advisory featured, programs grid, alternating photo timeline. 501(c)(3) note below donate button. Pure HTML + CSS + minimal vanilla JS.
+          </div>
+          <span class="card-link">Open Final Design</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+</div><!-- /phases -->
+
+<!-- REFLECTION -->
+<section class="reflection">
+  <div class="reflection-inner">
+    <h2>Process Reflection</h2>
+    <hr class="reflection-rule">
+
+    <div class="q-block">
+      <div class="q-label">Question 1</div>
+      <div class="q-text">How did your file and folder structure help (or hurt) your design pipeline?</div>
+      <div class="q-answer">
+        A flat folder structure — all 25 <code>v*.html</code> files in one directory — kept iteration fast. Each version was a full standalone file: no build step, no asset dependencies to track, no broken imports. The tradeoff was that later versions had to manually carry forward content and style changes from earlier ones, which meant occasionally re-discovering decisions made three versions back. In retrospect, a single shared CSS file for the converging palette variables (v13+) would have reduced copy-forward friction, but for a 25-version exploration it would have also created coupling that might have discouraged bolder visual experiments in early phases.
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">Question 2</div>
+      <div class="q-text">What would you change about your design process or pipeline?</div>
+      <div class="q-answer">
+        The biggest thing I'd change is where the audience definition happened. I spent the first 12 versions exploring aesthetic registers (cinematic dark mode, editorial, data-led) before anchoring to the primary visitor — someone who wants to donate, volunteer, or connect as a school administrator, with donate as the highest-priority action. Had I defined that hierarchy on day one, I might have collapsed the 25 versions into a tighter 12–15. On the technical side, I'd adopt a design token sheet shared across versions earlier, so palette changes (like switching to IMU's actual #2ea3f2 brand blue in v13) propagated automatically rather than requiring manual find-and-replace in a standalone file.
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">Question 3</div>
+      <div class="q-text">Why did you choose v25 as your final design?</div>
+      <div class="q-answer">
+        v25 wins on hierarchy, honesty, and friction reduction — the three things that matter most for a nonprofit donate page. The donate pathway card is visually dominant before a single word is read (the wider grid column is a spatial argument, not a label). The alternating photo timeline earns trust by telling the story chronologically — showing where IMU started, what it built, and who it changed — before asking for anything. And the interactive layer (sticky donate bar, amount chip picker, scroll-triggered animations) removes decision friction: the visitor doesn't need to scroll to find the ask, and they don't need to type a dollar amount because the common tiers are one tap away. v25 is also the first version where Elaine's advisory role is featured prominently rather than buried in the footer — which matters because personal advocacy from a board member is one of the strongest trust signals a small nonprofit can offer.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADVISORY -->
+<div class="advisory-band">
+  <div class="advisory-inner">
+    <div class="advisory-eyebrow">Advocated by a board member</div>
+    <p class="advisory-quote">
+      "IMU gave my students language for something they'd felt but couldn't name. When a student tells me they finally feel seen at school, I know this work matters. That's why I'm here."
+    </p>
+    <div class="advisory-attr">— Elaine, IMU Advisory Board Member</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div><strong style="color:rgba(255,255,255,.9)">IMU — Inspiring Multicultural Understanding</strong></div>
+  <div style="margin:.4rem 0">
+    <a href="v25.html">Final Design</a> &nbsp;·&nbsp;
+    <a href="https://www.imuproject.org" target="_blank" rel="noopener">imuproject.org</a>
+  </div>
+  <div>Design, Build, Ship — Assignment 1 &nbsp;·&nbsp; 25 Versions &nbsp;·&nbsp; © 2025</div>
+  <div style="margin-top:.5rem; font-style:italic; color:rgba(255,255,255,.4); font-size:.72rem">Advocated by Elaine, IMU Advisory Board Member</div>
+</footer>
+
+</body>
+</html>
