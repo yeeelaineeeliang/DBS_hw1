@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMU — Twelve Years of Belonging</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --amber:    #e8922a;
+      --amber-lt: #f2b865;
+      --amber-dk: #b86018;
+      --rust:     #c44e28;
+      --rust-lt:  #e87850;
+      --sage:     #6a8c5e;
+      --sage-lt:  #a8c49a;
+      --sage-dk:  #3e5c34;
+      --cream:    #faf5ec;
+      --parchment:#f2e8d4;
+      --warm-tan: #e0ceaa;
+      --bark:     #5c3a1e;
+      --dusk:     #2e1e0e;
+      --ink:      #221608;
+      --ink-mid:  #5c4020;
+      --ink-soft: #8a6840;
+      --ink-faint:#b8a080;
+      --spine:    var(--amber);
+    }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--dusk);
+      padding: 1rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      border-bottom: 3px solid var(--amber);
+    }
+
+    .nav-left {
+      display: flex;
+      flex-direction: column;
+      gap: .05rem;
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .nav-sub {
+      font-size: .6rem;
+      font-weight: 300;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.8rem;
+    }
+
+    .nav-link {
+      font-size: .7rem;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.5);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .nav-link:hover { color: var(--amber-lt); }
+
+    .nav-cta {
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--dusk);
+      background: var(--amber);
+      padding: .5rem 1.3rem;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: background .2s;
+    }
+
+    .nav-cta:hover { background: var(--amber-lt); }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--dusk);
+      position: relative;
+      overflow: hidden;
+      padding: 7rem 2.5rem 5rem;
+      text-align: center;
+    }
+
+    /* warm radial glow */
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,146,42,.18) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* subtle grain */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      font-size: .68rem;
+      font-weight: 500;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1.8rem;
+    }
+
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      width: 24px; height: 1px;
+      background: var(--amber);
+      opacity: .5;
+    }
+
+    .hero-h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.4rem, 6vw, 4.6rem);
+      font-weight: 400;
+      font-style: italic;
+      color: #fff;
+      line-height: 1.1;
+      letter-spacing: -.01em;
+      margin-bottom: 1.2rem;
+    }
+
+    .hero-h1 strong {
+      font-style: normal;
+      font-weight: 700;
+      display: block;
+    }
+
+    .hero-desc {
+      font-size: .97rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.55);
+      max-width: 480px;
+      margin: 0 auto 3rem;
+      line-height: 1.8;
+    }
+
+    /* stats row in hero */
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding-top: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat {
+      padding: 0 2.8rem;
+      border-right: 1px solid rgba(255,255,255,.1);
+      text-align: center;
+    }
+
+    .hero-stat:last-child { border-right: none; }
+
+    .hs-num {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 400;
+      color: var(--amber-lt);
+      line-height: 1;
+    }
+
+    .hs-lbl {
+      font-size: .62rem;
+      font-weight: 500;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      margin-top: .5rem;
+    }
+
+    /* ── CHAPTER INTRO BAR ── */
+    .chapter-bar {
+      background: var(--parchment);
+      border-bottom: 2px solid var(--warm-tan);
+      padding: 1.6rem 2.5rem;
+      text-align: center;
+    }
+
+    .chapter-bar p {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--ink-soft);
+    }
+
+    /* ── TIMELINE WRAPPER ── */
+    .timeline-section {
+      padding: 5rem 2rem 4rem;
+      position: relative;
+    }
+
+    .timeline-wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* center spine */
+    .timeline-wrap::before {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      background: linear-gradient(
+        to bottom,
+        var(--amber) 0%,
+        var(--amber-lt) 40%,
+        var(--sage-lt) 70%,
+        var(--sage) 100%
+      );
+      z-index: 0;
+    }
+
+    /* ── YEAR MARKER ── */
+    .year-marker {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+      margin: 3.5rem 0 1rem;
+    }
+
+    .year-marker:first-child { margin-top: 0; }
+
+    .year-badge {
+      background: var(--dusk);
+      color: var(--amber-lt);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      padding: .4rem 1.4rem;
+      border-radius: 100px;
+      border: 2px solid var(--amber);
+      box-shadow: 0 0 0 4px var(--cream), 0 4px 16px rgba(0,0,0,.12);
+      position: relative;
+    }
+
+    /* ── MILESTONE CARD ── */
+    .milestone {
+      display: grid;
+      grid-template-columns: 1fr 56px 1fr;
+      align-items: start;
+      gap: 0;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 3.5rem;
+    }
+
+    /* alternating: odd cards on left, even on right */
+    .milestone.left  .m-card { grid-column: 1; text-align: right; padding-right: 2.5rem; }
+    .milestone.left  .m-spine{ grid-column: 2; }
+    .milestone.left  .m-empty{ grid-column: 3; }
+
+    .milestone.right .m-empty{ grid-column: 1; }
+    .milestone.right .m-spine{ grid-column: 2; }
+    .milestone.right .m-card { grid-column: 3; text-align: left; padding-left: 2.5rem; }
+
+    /* spine column — dot */
+    .m-spine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 1.4rem;
+    }
+
+    .m-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--cream);
+      border: 3px solid var(--amber);
+      box-shadow: 0 0 0 4px var(--cream);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+      transition: transform .2s;
+    }
+
+    .milestone:hover .m-dot {
+      transform: scale(1.35);
+      border-color: var(--rust);
+    }
+
+    /* card styles */
+    .m-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.6rem 1.8rem;
+      box-shadow: 0 2px 12px rgba(92,58,30,.07), 0 1px 3px rgba(92,58,30,.06);
+      transition: box-shadow .2s, transform .2s;
+      position: relative;
+    }
+
+    .m-card:hover {
+      box-shadow: 0 8px 32px rgba(92,58,30,.13), 0 2px 6px rgba(92,58,30,.08);
+      transform: translateY(-3px);
+    }
+
+    /* card color accent by era */
+    .m-card.era-found    { border-top: 3px solid var(--rust); }
+    .m-card.era-grow     { border-top: 3px solid var(--amber); }
+    .m-card.era-reach    { border-top: 3px solid var(--amber-dk); }
+    .m-card.era-adapt    { border-top: 3px solid var(--sage); }
+    .m-card.era-flourish { border-top: 3px solid var(--sage-dk); }
+
+    /* connector arrow: left card points right, right card points left */
+    .milestone.left .m-card::after {
+      content: '';
+      position: absolute;
+      top: 1.6rem;
+      right: -9px;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 8px 0 8px 9px;
+      border-color: transparent transparent transparent #fff;
+      filter: drop-shadow(2px 0 2px rgba(92,58,30,.06));
+    }
+
+    .milestone.right .m-card::before {
+      content: '';
+      position: absolute;
+      top: 1.6rem;
+      left: -9px;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 8px 9px 8px 0;
+      border-color: transparent #fff transparent transparent;
+      filter: drop-shadow(-2px 0 2px rgba(92,58,30,.06));
+    }
+
+    .m-tag {
+      font-size: .62rem;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      margin-bottom: .6rem;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .milestone.left .m-tag { justify-content: flex-end; }
+    .milestone.right .m-tag { justify-content: flex-start; }
+
+    .tag-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .m-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.25;
+      margin-bottom: .65rem;
+    }
+
+    .m-body {
+      font-size: .9rem;
+      font-weight: 300;
+      color: var(--ink-mid);
+      line-height: 1.75;
+    }
+
+    /* milestone image placeholder */
+    .m-img {
+      width: 100%;
+      height: 120px;
+      border-radius: 8px;
+      margin-top: 1rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .m-img-inner {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* highlight stat inside card */
+    .m-stat {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      background: var(--parchment);
+      border-radius: 8px;
+      padding: .6rem .9rem;
+      margin-top: .9rem;
+    }
+
+    .m-stat-num {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--amber-dk);
+      line-height: 1;
+    }
+
+    .m-stat-lbl {
+      font-size: .68rem;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-top: .25rem;
+    }
+
+    /* quote card variant */
+    .m-card.quote-card {
+      background: var(--dusk);
+      color: #fff;
+    }
+
+    .m-card.quote-card .m-body {
+      color: rgba(255,255,255,.7);
+      font-style: italic;
+    }
+
+    .m-card.quote-card .m-title {
+      color: var(--amber-lt);
+    }
+
+    .m-card.quote-card::after { border-color: transparent transparent transparent var(--dusk); }
+    .m-card.quote-card::before { border-color: transparent var(--dusk) transparent transparent; }
+
+    /* ── ERA DIVIDER ── */
+    .era-divider {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      max-width: 980px;
+      margin: 1rem auto 0;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .era-divider::before,
+    .era-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--warm-tan);
+    }
+
+    .era-label {
+      font-size: .63rem;
+      font-weight: 600;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      white-space: nowrap;
+      padding: .3rem .8rem;
+      border: 1px solid var(--warm-tan);
+      border-radius: 100px;
+      background: var(--cream);
+    }
+
+    /* ── PRESENT STAR ── */
+    .present-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      margin: 2rem 0 4rem;
+    }
+
+    .present-ring {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--amber);
+      border: 4px solid #fff;
+      box-shadow: 0 0 0 3px var(--amber), 0 6px 24px rgba(232,146,42,.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .present-label {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--ink-soft);
+    }
+
+    /* ── DONATE SECTION ── */
+    .donate-section {
+      background: var(--dusk);
+      padding: 6rem 2rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .donate-section::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,146,42,.12) 0%, transparent 65%);
+      top: 50%; right: -150px;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .donate-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .donate-eyebrow {
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1.4rem;
+    }
+
+    .donate-h {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 400;
+      font-style: italic;
+      color: #fff;
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+    }
+
+    .donate-h strong {
+      font-style: normal;
+      font-weight: 700;
+      color: var(--amber-lt);
+    }
+
+    .donate-body {
+      font-size: .95rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.55);
+      max-width: 480px;
+      margin: 0 auto 3.5rem;
+      line-height: 1.85;
+    }
+
+    /* Impact row */
+    .donate-impacts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 640px) {
+      .donate-impacts { grid-template-columns: 1fr 1fr; }
+    }
+
+    .di-cell {
+      background: rgba(255,255,255,.04);
+      padding: 1.4rem 1rem;
+      text-align: center;
+      transition: background .2s;
+    }
+
+    .di-cell:hover { background: rgba(255,255,255,.08); }
+
+    .di-amt {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      color: var(--amber-lt);
+      line-height: 1;
+      margin-bottom: .4rem;
+    }
+
+    .di-desc {
+      font-size: .75rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.4);
+      line-height: 1.5;
+    }
+
+    .donate-btns {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-d {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: .9rem 2.4rem;
+      border-radius: 3px;
+      transition: background .2s, color .2s, border-color .2s;
+      display: inline-block;
+    }
+
+    .btn-amber  { background: var(--amber); color: var(--dusk); }
+    .btn-amber:hover { background: var(--amber-lt); }
+    .btn-ghost  { background: transparent; color: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.25); }
+    .btn-ghost:hover { border-color: rgba(255,255,255,.6); color: #fff; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      padding: 2.8rem 2.5rem 2.2rem;
+    }
+
+    .footer-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      margin-bottom: 1.6rem;
+    }
+
+    .f-brand-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.8);
+    }
+
+    .f-brand-sub {
+      font-size: .62rem;
+      font-weight: 300;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.25);
+      margin-top: .3rem;
+    }
+
+    .f-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .f-links a {
+      font-size: .65rem;
+      font-weight: 400;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .f-links a:hover { color: var(--amber-lt); }
+
+    .footer-base {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .8rem;
+    }
+
+    .footer-advocate {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: .92rem;
+      font-style: italic;
+      color: rgba(255,255,255,.3);
+    }
+
+    .footer-advocate strong {
+      color: var(--amber);
+      font-style: normal;
+    }
+
+    .footer-copy {
+      font-size: .62rem;
+      font-weight: 300;
+      letter-spacing: .1em;
+      color: rgba(255,255,255,.18);
+    }
+
+    /* ── MOBILE TIMELINE ── */
+    @media (max-width: 680px) {
+      .timeline-wrap::before { left: 24px; }
+
+      .year-marker { justify-content: flex-start; padding-left: 8px; }
+
+      .milestone {
+        grid-template-columns: 56px 1fr;
+        margin-bottom: 2.5rem;
+      }
+
+      .milestone.left  .m-card,
+      .milestone.right .m-card {
+        grid-column: 2;
+        grid-row: 1;
+        text-align: left;
+        padding-left: 1.4rem;
+        padding-right: 1.4rem;
+      }
+
+      .milestone.left  .m-spine,
+      .milestone.right .m-spine {
+        grid-column: 1;
+        grid-row: 1;
+      }
+
+      .milestone.left  .m-empty,
+      .milestone.right .m-empty { display: none; }
+
+      .milestone.left  .m-tag { justify-content: flex-start; }
+
+      .milestone.left  .m-card::after  { display: none; }
+      .milestone.right .m-card::before { display: none; }
+
+      .milestone.right .m-card::after {
+        content: '';
+        position: absolute;
+        top: 1.6rem;
+        left: -9px;
+        width: 0; height: 0;
+        border-style: solid;
+        border-width: 8px 9px 8px 0;
+        border-color: transparent #fff transparent transparent;
+      }
+
+      .milestone.right.quote-wrap .m-card::after {
+        border-color: transparent var(--dusk) transparent transparent;
+      }
+
+      nav .nav-link { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav>
+    <div class="nav-left">
+      <a href="#" class="nav-logo">IMU</a>
+      <span class="nav-sub">Inspiring Multicultural Understanding</span>
+    </div>
+    <div class="nav-right">
+      <a href="#timeline" class="nav-link">Our Story</a>
+      <a href="#donate" class="nav-link">Impact</a>
+      <a href="#donate" class="nav-cta">Donate</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">Our Story</div>
+      <h1 class="hero-h1">
+        Twelve Years<br>
+        <strong>of Belonging</strong>
+      </h1>
+      <p class="hero-desc">
+        From a single classroom circle in 2014 to a nationwide network of
+        student voices — this is the story of what happens when young people
+        are finally given the space to be seen.
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hs-num">2014</div>
+          <div class="hs-lbl">Founded</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hs-num">4,200+</div>
+          <div class="hs-lbl">Students</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hs-num">38</div>
+          <div class="hs-lbl">Schools</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hs-num">94%</div>
+          <div class="hs-lbl">Feel Seen</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CHAPTER INTRO ── -->
+  <div class="chapter-bar">
+    <p>Scroll through the moments that made us. Each one is a student, a school, a circle.</p>
+  </div>
+
+  <!-- ── TIMELINE ── -->
+  <section class="timeline-section" id="timeline">
+    <div class="timeline-wrap">
+
+      <!-- ═══════════ 2014 ═══════════ -->
+      <div class="year-marker">
+        <span class="year-badge">2014</span>
+      </div>
+
+      <div class="era-divider">
+        <span class="era-label">The Beginning</span>
+      </div>
+
+      <!-- 1. FOUNDING -->
+      <div class="milestone left">
+        <div class="m-card era-found m-card">
+          <div class="m-tag" style="color:var(--rust);">
+            <span class="tag-dot" style="background:var(--rust);"></span>
+            Founding Moment
+          </div>
+          <h3 class="m-title">IMU Is Born</h3>
+          <p class="m-body">
+            A group of educators and community members in Chicago gathers around a
+            shared frustration: schools are full of students who feel invisible.
+            Invisible in the curriculum. Invisible in the hallways. Invisible in
+            every conversation that matters.
+            From that frustration, Inspiring Multicultural Understanding is founded —
+            with one radical belief: that open dialogue about culture and race
+            is not dangerous. It is necessary.
+          </p>
+        </div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-empty"></div>
+      </div>
+
+      <!-- 2. FIRST PEACE CLUB -->
+      <div class="milestone right">
+        <div class="m-empty"></div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-card era-found">
+          <div class="m-tag" style="color:var(--rust);">
+            <span class="tag-dot" style="background:var(--rust);"></span>
+            First Program
+          </div>
+          <h3 class="m-title">The First Peace Club</h3>
+          <p class="m-body">
+            Lincoln Middle School in Chicago becomes IMU's first partner.
+            Twelve students, one facilitator, a borrowed classroom on Thursday afternoons.
+            They call it the Peace Club — and within six weeks, there is a waiting list.
+            Word travels the way things do when something feels real: student to student,
+            in the lunch line, on the bus home.
+          </p>
+          <div class="m-img">
+            <div class="m-img-inner" style="background:linear-gradient(135deg,#c47840 0%,#7a3018 55%,#2e1408 100%);border-radius:8px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 2015 ═══════════ -->
+      <div class="year-marker">
+        <span class="year-badge">2015</span>
+      </div>
+
+      <div class="era-divider">
+        <span class="era-label">First Roots</span>
+      </div>
+
+      <!-- 3. EXPANDING -->
+      <div class="milestone left">
+        <div class="m-card era-grow">
+          <div class="m-tag" style="color:var(--amber-dk);">
+            <span class="tag-dot" style="background:var(--amber-dk);"></span>
+            Growth
+          </div>
+          <h3 class="m-title">Three Schools, One Voice</h3>
+          <p class="m-body">
+            IMU expands to three schools across the Chicago metro area.
+            Each Peace Club takes on its own character — its own rituals, its own
+            language for hard conversations. But every circle ends the same way:
+            hands in the center. Students call it "locking in."
+            The gesture becomes IMU's unofficial symbol.
+          </p>
+          <div class="m-stat">
+            <span class="m-stat-num">3</span>
+            <span class="m-stat-lbl">Partner schools by end of year</span>
+          </div>
+        </div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-empty"></div>
+      </div>
+
+      <!-- 4. INTL DAY OF PEACE FIRST -->
+      <div class="milestone right">
+        <div class="m-empty"></div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-card era-grow">
+          <div class="m-tag" style="color:var(--amber-dk);">
+            <span class="tag-dot" style="background:var(--amber-dk);"></span>
+            First Celebration
+          </div>
+          <h3 class="m-title">International Day of Peace — Year One</h3>
+          <p class="m-body">
+            On September 21st, IMU hosts its first International Day of Peace event.
+            Students from all three partner schools gather in a gymnasium and share
+            one thing from their culture — a song, a food, a word, a story.
+            The event runs three hours over schedule.
+            Nobody leaves early.
+          </p>
+        </div>
+      </div>
+
+      <!-- ═══════════ 2016 ═══════════ -->
+      <div class="year-marker">
+        <span class="year-badge">2016</span>
+      </div>
+
+      <!-- 5. FIRST CAMPING RETREAT -->
+      <div class="milestone left">
+        <div class="m-card era-grow">
+          <div class="m-tag" style="color:var(--amber-dk);">
+            <span class="tag-dot" style="background:var(--amber-dk);"></span>
+            Landmark Event
+          </div>
+          <h3 class="m-title">The First Camping Retreat</h3>
+          <p class="m-body">
+            Forty students. Two nights. No phones. No grades. No labels.
+            The first IMU camping retreat becomes one of the most talked-about
+            experiences in the program's history. Students who arrived strangers
+            come back changed. Teachers who chaperone report that their classrooms
+            feel different for weeks afterward.
+            "It's like they finally saw each other," one teacher says.
+            "Really saw each other."
+          </p>
+          <div class="m-img">
+            <div class="m-img-inner" style="background:linear-gradient(160deg,#3a5c2a 0%,#6a8c40 40%,#c4a840 75%,#e8c860 100%);border-radius:8px;"></div>
+          </div>
+        </div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-empty"></div>
+      </div>
+
+      <!-- 6. QUOTE — student -->
+      <div class="milestone right quote-wrap">
+        <div class="m-empty"></div>
+        <div class="m-spine"><div class="m-dot" style="border-color:var(--bark);"></div></div>
+        <div class="m-card era-grow quote-card">
+          <div class="m-tag" style="color:var(--amber-lt);">
+            <span class="tag-dot" style="background:var(--amber-lt);"></span>
+            Heard at Camp
+          </div>
+          <h3 class="m-title">"For the first time, I wasn't the only one."</h3>
+          <p class="m-body">
+            "I'd never been somewhere where people actually wanted to hear about
+            where I came from. At the retreat, we were up until 2am just talking.
+            About our families. Our food. Our fears. I drove home different."
+          </p>
+          <p style="font-size:.75rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:1rem;">
+            — IMU Student, 2016 Retreat
+          </p>
+        </div>
+      </div>
+
+      <!-- ═══════════ 2017–2018 ═══════════ -->
+      <div class="year-marker">
+        <span class="year-badge">2017 – 2018</span>
+      </div>
+
+      <div class="era-divider">
+        <span class="era-label">Reaching Further</span>
+      </div>
+
+      <!-- 7. LA EXPANSION -->
+      <div class="milestone left">
+        <div class="m-card era-reach">
+          <div class="m-tag" style="color:var(--amber-dk);">
+            <span class="tag-dot" style="background:var(--amber-dk);"></span>
+            Expansion
+          </div>
+          <h3 class="m-title">Beyond Chicago — Los Angeles Joins</h3>
+          <p class="m-body">
+            A school counselor in Los Angeles who read about IMU in a regional
+            education newsletter sends a cold email asking if they can be next.
+            Within a year, seven LA schools have Peace Clubs running.
+            Javier, then 14, joins one of the first cohorts.
+            "I finally felt like I belonged," he later says,
+            "not despite who I am — but because of it."
+          </p>
+          <div class="m-stat">
+            <span class="m-stat-num">14</span>
+            <span class="m-stat-lbl">Partner schools by end of 2018</span>
+          </div>
+        </div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-empty"></div>
+      </div>
+
+      <!-- 8. YOUTH FACILITATOR PROGRAM -->
+      <div class="milestone right">
+        <div class="m-empty"></div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-card era-reach">
+          <div class="m-tag" style="color:var(--amber-dk);">
+            <span class="tag-dot" style="background:var(--amber-dk);"></span>
+            New Program
+          </div>
+          <h3 class="m-title">Students Become Facilitators</h3>
+          <p class="m-body">
+            IMU launches its Youth Facilitator Training program — the recognition
+            that the most powerful voice in any circle is another young person.
+            The inaugural cohort of 22 students trains over an eight-week summer
+            program. By fall, they are leading circles at their own schools.
+            The model works so well it becomes the backbone of everything IMU does.
+          </p>
+          <div class="m-img">
+            <div class="m-img-inner" style="background:linear-gradient(140deg,#8a3010 0%,#c46030 40%,#e8a050 75%,#f0c880 100%);border-radius:8px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 2019 ═══════════ -->
+      <div class="year-marker">
+        <span class="year-badge">2019</span>
+      </div>
+
+      <div class="era-divider">
+        <span class="era-label">A Milestone Year</span>
+      </div>
+
+      <!-- 9. INTL DAY OF PEACE LARGE -->
+      <div class="milestone left">
+        <div class="m-card era-reach">
+          <div class="m-tag" style="color:var(--amber-dk);">
+            <span class="tag-dot" style="background:var(--amber-dk);"></span>
+            Annual Celebration
+          </div>
+          <h3 class="m-title">International Day of Peace — 800 Students</h3>
+          <p class="m-body">
+            The fifth annual International Day of Peace celebration draws students,
+            educators, and families from nineteen schools across three cities.
+            The event fills an auditorium. There are performances, stories, a
+            candlelight moment of silence. A parent cries when her daughter takes
+            the microphone to talk about her grandmother's immigration story —
+            something she has never said out loud, not even at home.
+          </p>
+          <div class="m-stat">
+            <span class="m-stat-num">800+</span>
+            <span class="m-stat-lbl">Attendees at the 2019 celebration</span>
+          </div>
+        </div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-empty"></div>
+      </div>
+
+      <!-- ═══════════ 2020 ═══════════ -->
+      <div class="year-marker">
+        <span class="year-badge">2020</span>
+      </div>
+
+      <div class="era-divider">
+        <span class="era-label">Adapting</span>
+      </div>
+
+      <!-- 10. PANDEMIC -->
+      <div class="milestone right">
+        <div class="m-empty"></div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-card era-adapt">
+          <div class="m-tag" style="color:var(--sage);">
+            <span class="tag-dot" style="background:var(--sage);"></span>
+            Resilience
+          </div>
+          <h3 class="m-title">The Circle Moves Online</h3>
+          <p class="m-body">
+            When schools close, IMU does not pause. Within two weeks, every Peace Club
+            has migrated to video calls. The logistics are harder. The silences are
+            awkward in new ways. But the need — to be heard, to be seen, to say the
+            thing you've been carrying — that need only grows. Attendance actually
+            increases. Some students say the distance makes it easier to be honest.
+          </p>
+        </div>
+      </div>
+
+      <!-- ═══════════ 2021–2022 ═══════════ -->
+      <div class="year-marker">
+        <span class="year-badge">2021 – 2022</span>
+      </div>
+
+      <div class="era-divider">
+        <span class="era-label">Returning &amp; Growing</span>
+      </div>
+
+      <!-- 11. RETURN -->
+      <div class="milestone left">
+        <div class="m-card era-flourish">
+          <div class="m-tag" style="color:var(--sage-dk);">
+            <span class="tag-dot" style="background:var(--sage-dk);"></span>
+            Return
+          </div>
+          <h3 class="m-title">Back in the Room — Stronger Than Before</h3>
+          <p class="m-body">
+            Students return to in-person circles for the first time in eighteen months.
+            The first session at every school runs long. Nobody wants to end it.
+            IMU welcomes its largest-ever class of youth facilitator trainees —
+            64 students, including Aisha from Atlanta, who will go on to organize
+            her school's first student-led dialogue forum the following year.
+          </p>
+          <div class="m-stat">
+            <span class="m-stat-num">64</span>
+            <span class="m-stat-lbl">Youth facilitators trained in 2021</span>
+          </div>
+        </div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-empty"></div>
+      </div>
+
+      <!-- 12. INTL DAY RECORD -->
+      <div class="milestone right">
+        <div class="m-empty"></div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-card era-flourish">
+          <div class="m-tag" style="color:var(--sage-dk);">
+            <span class="tag-dot" style="background:var(--sage-dk);"></span>
+            Record Year
+          </div>
+          <h3 class="m-title">International Day of Peace — Largest Ever</h3>
+          <p class="m-body">
+            The 2022 celebration is IMU's biggest yet: twenty-six schools, four cities,
+            a three-hour program that opens with a student choir and closes with
+            every person in the room writing one sentence they've never said out loud —
+            and reading it to a stranger.
+            "I have never felt less alone in a crowd," one student writes in
+            her reflection form, "than I did in that room."
+          </p>
+          <div class="m-img">
+            <div class="m-img-inner" style="background:linear-gradient(120deg,#1a3020 0%,#3a6030 35%,#8aaa40 65%,#c8c840 100%);border-radius:8px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 2023–2024 ═══════════ -->
+      <div class="year-marker">
+        <span class="year-badge">2023 – 2024</span>
+      </div>
+
+      <div class="era-divider">
+        <span class="era-label">Deep Roots</span>
+      </div>
+
+      <!-- 13. ATLANTA -->
+      <div class="milestone left">
+        <div class="m-card era-flourish">
+          <div class="m-tag" style="color:var(--sage-dk);">
+            <span class="tag-dot" style="background:var(--sage-dk);"></span>
+            Milestone
+          </div>
+          <h3 class="m-title">4,200 Students — and Counting</h3>
+          <p class="m-body">
+            IMU crosses the 4,000-student mark. 38 partner schools. 12 cities.
+            94% of participants report feeling more understood by their peers
+            after completing an IMU program. The number that matters most, though,
+            is harder to count: how many of those students went home that day and
+            told their family something they'd been keeping to themselves.
+          </p>
+          <div class="m-stat">
+            <span class="m-stat-num">4,200+</span>
+            <span class="m-stat-lbl">Total students reached</span>
+          </div>
+        </div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-empty"></div>
+      </div>
+
+      <!-- 14. AISHA FORUM -->
+      <div class="milestone right">
+        <div class="m-empty"></div>
+        <div class="m-spine"><div class="m-dot"></div></div>
+        <div class="m-card era-flourish">
+          <div class="m-tag" style="color:var(--sage-dk);">
+            <span class="tag-dot" style="background:var(--sage-dk);"></span>
+            Student Leadership
+          </div>
+          <h3 class="m-title">Aisha's Forum — Students Lead the Way</h3>
+          <p class="m-body">
+            Aisha, 18, organizes her school's first student-led dialogue forum
+            in Atlanta — planned, facilitated, and promoted entirely by the
+            school's IMU cohort. The district superintendent attends.
+            Three other school principals request a meeting with IMU the
+            following week. This is what the Youth Facilitator Program was
+            always meant to become.
+          </p>
+        </div>
+      </div>
+
+      <!-- ═══════════ TODAY ═══════════ -->
+      <div class="present-node">
+        <div class="present-ring">✦</div>
+        <span class="present-label">The story continues — with you.</span>
+      </div>
+
+    </div><!-- /timeline-wrap -->
+  </section>
+
+  <!-- ── DONATE ── -->
+  <section class="donate-section" id="donate">
+    <div class="donate-inner">
+      <p class="donate-eyebrow">Write the Next Chapter</p>
+      <h2 class="donate-h">
+        Every great story<br>needs someone<br><strong>to keep it going.</strong>
+      </h2>
+      <p class="donate-body">
+        Twelve years of circles, retreats, celebrations, and honest conversations
+        have been made possible by people who believed this work mattered.
+        Your gift writes the next milestone on this timeline.
+      </p>
+
+      <div class="donate-impacts">
+        <div class="di-cell">
+          <div class="di-amt">$25</div>
+          <div class="di-desc">Supplies one student for a full semester</div>
+        </div>
+        <div class="di-cell">
+          <div class="di-amt">$100</div>
+          <div class="di-desc">Funds one dialogue circle for 15 students</div>
+        </div>
+        <div class="di-cell">
+          <div class="di-amt">$250</div>
+          <div class="di-desc">Trains one youth facilitator end-to-end</div>
+        </div>
+        <div class="di-cell">
+          <div class="di-amt">$1,000</div>
+          <div class="di-desc">Launches a new school partnership for a semester</div>
+        </div>
+      </div>
+
+      <div class="donate-btns">
+        <a href="#" class="btn-d btn-amber">Donate Now</a>
+        <a href="#" class="btn-d btn-ghost">Volunteer</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="f-brand-name">IMU</div>
+        <div class="f-brand-sub">Inspiring Multicultural Understanding · Est. 2014</div>
+      </div>
+      <div class="f-links">
+        <a href="#">About</a>
+        <a href="#">Programs</a>
+        <a href="#">Schools</a>
+        <a href="#">Volunteer</a>
+        <a href="#">Press</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="footer-base">
+      <p class="footer-advocate">
+        Advocated by <strong>Elaine</strong>, IMU Advisory Board Member.
+      </p>
+      <p class="footer-copy">© 2026 IMU · 501(c)(3) Nonprofit</p>
+    </div>
+  </footer>
+
+</body>
+</html>

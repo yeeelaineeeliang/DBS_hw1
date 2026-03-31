@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMU — Impact Dashboard</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300;1,9..144,600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #1a2540;
+      --navy-mid:  #243058;
+      --amber:     #e8922a;
+      --amber-lt:  #f2b05a;
+      --amber-pale:#fdf0dc;
+      --green:     #2e8b57;
+      --green-lt:  #4aab74;
+      --green-pale:#e4f5ec;
+      --rose:      #c8445a;
+      --rose-pale: #faeaed;
+      --sky:       #2a6aad;
+      --sky-pale:  #e4eef8;
+      --cream:     #faf7f2;
+      --white:     #ffffff;
+      --border:    #ede7dc;
+      --ink:       #1a140a;
+      --ink-mid:   #4a3c28;
+      --ink-soft:  #8a7858;
+      --ink-faint: #c0ac90;
+
+      /* chart accent colours */
+      --c1: #e8922a;
+      --c2: #2e8b57;
+      --c3: #2a6aad;
+      --c4: #9b5de5;
+      --c5: #c8445a;
+    }
+
+    html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.5;
+    }
+
+    /* ── GLOBAL ANIMATION ── */
+    @keyframes count-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bar-grow {
+      from { width: 0; }
+    }
+
+    @keyframes ring-fill {
+      from { background: conic-gradient(var(--amber) 0deg, #e8e0d0 0deg); }
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(1.35); opacity: .7; }
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .85rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      border-bottom: 2px solid rgba(232,146,42,.3);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-logo {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: .04em;
+    }
+
+    .nav-divider {
+      width: 1px;
+      height: 18px;
+      background: rgba(255,255,255,.2);
+    }
+
+    .nav-title {
+      font-size: .68rem;
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.45);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .nav-tag {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      color: rgba(255,255,255,.4);
+    }
+
+    .live-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green-lt);
+      animation: pulse-dot 2.2s ease-in-out infinite;
+    }
+
+    .nav-btn {
+      font-size: .67rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--navy);
+      background: var(--amber);
+      padding: .45rem 1.2rem;
+      text-decoration: none;
+      border-radius: 3px;
+      transition: background .2s;
+    }
+
+    .nav-btn:hover { background: var(--amber-lt); }
+
+    /* ── SECTION WRAPPER ── */
+    .dash {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      background: var(--navy);
+      padding: 3.5rem 2rem 2.5rem;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .ph-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 2rem;
+    }
+
+    @media (max-width: 700px) { .ph-inner { grid-template-columns: 1fr; } }
+
+    .ph-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      color: var(--amber);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      margin-bottom: .8rem;
+    }
+
+    .ph-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+    }
+
+    .ph-title em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--amber-lt);
+    }
+
+    .ph-sub {
+      font-size: .88rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.5);
+      margin-top: .8rem;
+      max-width: 480px;
+      line-height: 1.7;
+    }
+
+    .ph-meta {
+      text-align: right;
+    }
+
+    .ph-meta-label {
+      font-family: 'DM Mono', monospace;
+      font-size: .6rem;
+      color: rgba(255,255,255,.3);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: .3rem;
+    }
+
+    .ph-meta-val {
+      font-family: 'DM Mono', monospace;
+      font-size: .82rem;
+      color: rgba(255,255,255,.55);
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--white);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 1.6rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-label {
+      font-family: 'DM Mono', monospace;
+      font-size: .6rem;
+      font-weight: 500;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .card-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── SECTION TITLE ── */
+    .section-head {
+      padding: 2.8rem 0 1.4rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    .sh-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -.01em;
+    }
+
+    .sh-sub {
+      font-size: .78rem;
+      font-weight: 400;
+      color: var(--ink-soft);
+    }
+
+    /* ────────────────────────────────────
+       KPI ROW
+    ──────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      padding: 2rem 0 0;
+    }
+
+    @media (max-width: 780px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 420px) { .kpi-row { grid-template-columns: 1fr; } }
+
+    .kpi-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem 1.6rem;
+      animation: fade-up .5s ease both;
+    }
+
+    .kpi-card:nth-child(1) { animation-delay: .05s; border-top: 3px solid var(--amber); }
+    .kpi-card:nth-child(2) { animation-delay: .1s;  border-top: 3px solid var(--green); }
+    .kpi-card:nth-child(3) { animation-delay: .15s; border-top: 3px solid var(--sky); }
+    .kpi-card:nth-child(4) { animation-delay: .2s;  border-top: 3px solid var(--rose); }
+
+    .kpi-label {
+      font-family: 'DM Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: .6rem;
+    }
+
+    .kpi-number {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(2.4rem, 4vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -.03em;
+      animation: count-up .6s ease both;
+    }
+
+    .kpi-card:nth-child(1) .kpi-number { color: var(--amber); animation-delay: .1s; }
+    .kpi-card:nth-child(2) .kpi-number { color: var(--green); animation-delay: .15s; }
+    .kpi-card:nth-child(3) .kpi-number { color: var(--sky);   animation-delay: .2s; }
+    .kpi-card:nth-child(4) .kpi-number { color: var(--rose);  animation-delay: .25s; }
+
+    .kpi-unit {
+      font-size: .5em;
+      font-weight: 300;
+      vertical-align: super;
+      opacity: .7;
+    }
+
+    .kpi-desc {
+      font-size: .8rem;
+      font-weight: 400;
+      color: var(--ink-soft);
+      margin-top: .5rem;
+      line-height: 1.5;
+    }
+
+    .kpi-delta {
+      display: inline-flex;
+      align-items: center;
+      gap: .25rem;
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      font-weight: 500;
+      padding: .2rem .5rem;
+      border-radius: 4px;
+      margin-top: .6rem;
+    }
+
+    .kpi-delta.up   { background: var(--green-pale); color: var(--green); }
+    .kpi-delta.high { background: var(--amber-pale);  color: var(--amber); }
+
+    /* ────────────────────────────────────
+       GROWTH BAR CHART
+    ──────────────────────────────────── */
+    .bar-chart-card {
+      animation: fade-up .5s .25s ease both;
+    }
+
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: .5rem;
+      height: 140px;
+      padding-top: 1rem;
+    }
+
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: .4rem;
+      height: 100%;
+    }
+
+    .bar-val {
+      font-family: 'DM Mono', monospace;
+      font-size: .6rem;
+      color: var(--ink-soft);
+    }
+
+    .bar {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      animation: bar-grow .8s cubic-bezier(.22,.68,0,1.2) both;
+      transform-origin: bottom;
+    }
+
+    .bar-col:nth-child(1)  .bar { height: 8%;  background: var(--amber-pale); animation-delay:.1s; }
+    .bar-col:nth-child(2)  .bar { height: 14%; background: var(--amber-pale); animation-delay:.15s; }
+    .bar-col:nth-child(3)  .bar { height: 22%; background: var(--amber-pale); animation-delay:.2s; }
+    .bar-col:nth-child(4)  .bar { height: 30%; background: color-mix(in srgb, var(--amber) 30%, var(--amber-pale)); animation-delay:.25s; }
+    .bar-col:nth-child(5)  .bar { height: 40%; background: color-mix(in srgb, var(--amber) 45%, var(--amber-pale)); animation-delay:.3s; }
+    .bar-col:nth-child(6)  .bar { height: 38%; background: color-mix(in srgb, var(--amber) 42%, var(--amber-pale)); animation-delay:.35s; }
+    .bar-col:nth-child(7)  .bar { height: 55%; background: color-mix(in srgb, var(--amber) 60%, var(--amber-pale)); animation-delay:.4s; }
+    .bar-col:nth-child(8)  .bar { height: 68%; background: color-mix(in srgb, var(--amber) 72%, var(--amber-pale)); animation-delay:.45s; }
+    .bar-col:nth-child(9)  .bar { height: 78%; background: color-mix(in srgb, var(--amber) 82%, var(--amber-pale)); animation-delay:.5s; }
+    .bar-col:nth-child(10) .bar { height: 88%; background: var(--amber); animation-delay:.55s; }
+    .bar-col:nth-child(11) .bar { height: 95%; background: var(--amber); animation-delay:.6s; }
+    .bar-col:nth-child(12) .bar { height: 100%;background: var(--amber-dk, #b86018); animation-delay:.65s; }
+
+    .bar-year {
+      font-family: 'DM Mono', monospace;
+      font-size: .58rem;
+      color: var(--ink-faint);
+      white-space: nowrap;
+    }
+
+    .chart-baseline {
+      height: 1px;
+      background: var(--border);
+      margin-top: .4rem;
+    }
+
+    /* ────────────────────────────────────
+       DONUT RINGS
+    ──────────────────────────────────── */
+    .rings-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 600px) { .rings-grid { grid-template-columns: 1fr; } }
+
+    .ring-card {
+      padding: 1.6rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      animation: fade-up .5s ease both;
+    }
+
+    .ring-card:nth-child(1) { animation-delay: .1s; }
+    .ring-card:nth-child(2) { animation-delay: .2s; }
+    .ring-card:nth-child(3) { animation-delay: .3s; }
+
+    .donut {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.1rem;
+    }
+
+    /* conic-gradient donut rings */
+    .donut-94 {
+      background: conic-gradient(var(--green) 0deg 338.4deg, #e0ece6 338.4deg 360deg);
+      animation: ring-fill .9s .2s ease both;
+    }
+
+    .donut-88 {
+      background: conic-gradient(var(--amber) 0deg 316.8deg, #f0e6d0 316.8deg 360deg);
+    }
+
+    .donut-79 {
+      background: conic-gradient(var(--sky) 0deg 284.4deg, #dceaf5 284.4deg 360deg);
+    }
+
+    /* inner white circle */
+    .donut::after {
+      content: '';
+      position: absolute;
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--white);
+    }
+
+    .donut-inner {
+      position: absolute;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1;
+    }
+
+    .donut-pct {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -.03em;
+    }
+
+    .donut-94 .donut-pct { color: var(--green); }
+    .donut-88 .donut-pct { color: var(--amber); }
+    .donut-79 .donut-pct { color: var(--sky); }
+
+    .donut-sym {
+      font-size: .55em;
+      vertical-align: super;
+      font-weight: 300;
+    }
+
+    .ring-title {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: .35rem;
+      line-height: 1.3;
+    }
+
+    .ring-desc {
+      font-size: .78rem;
+      font-weight: 300;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+
+    /* ────────────────────────────────────
+       HORIZONTAL BARS — Program Outcomes
+    ──────────────────────────────────── */
+    .hbar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .hbar-item {}
+
+    .hbar-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: .4rem;
+    }
+
+    .hbar-label {
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .hbar-pct {
+      font-family: 'DM Mono', monospace;
+      font-size: .75rem;
+      color: var(--ink-soft);
+    }
+
+    .hbar-track {
+      height: 9px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .hbar-fill {
+      height: 100%;
+      border-radius: 100px;
+      animation: bar-grow 1s cubic-bezier(.22,.68,0,1.2) both;
+    }
+
+    .hbar-fill.c-amber  { background: var(--amber);    animation-delay: .1s; }
+    .hbar-fill.c-green  { background: var(--green);    animation-delay: .18s; }
+    .hbar-fill.c-sky    { background: var(--sky);      animation-delay: .26s; }
+    .hbar-fill.c-rose   { background: var(--rose);     animation-delay: .34s; }
+    .hbar-fill.c-purple { background: #9b5de5;         animation-delay: .42s; }
+
+    /* ────────────────────────────────────
+       SCHOOL GROWTH TABLE
+    ──────────────────────────────────── */
+    .growth-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .growth-table th {
+      font-family: 'DM Mono', monospace;
+      font-size: .6rem;
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      text-align: left;
+      padding: .5rem .8rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .growth-table td {
+      font-size: .85rem;
+      color: var(--ink-mid);
+      padding: .75rem .8rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .growth-table tr:last-child td { border-bottom: none; }
+
+    .growth-table tr:hover td { background: var(--cream); }
+
+    .gt-year {
+      font-family: 'DM Mono', monospace;
+      font-size: .78rem;
+      color: var(--ink-soft);
+      white-space: nowrap;
+    }
+
+    .gt-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+
+    .gt-bar-track {
+      flex: 1;
+      height: 8px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .gt-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--amber);
+      animation: bar-grow 1s cubic-bezier(.22,.68,0,1.2) both;
+    }
+
+    .gt-num {
+      font-family: 'DM Mono', monospace;
+      font-size: .75rem;
+      color: var(--ink-soft);
+      width: 2.5rem;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .gt-milestone {
+      font-size: .72rem;
+      color: var(--amber);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* ────────────────────────────────────
+       GEOGRAPHIC TILES
+    ──────────────────────────────────── */
+    .geo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .75rem;
+    }
+
+    @media (max-width: 600px) { .geo-grid { grid-template-columns: 1fr 1fr; } }
+
+    .geo-tile {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1rem .9rem;
+      display: flex;
+      flex-direction: column;
+      gap: .3rem;
+      animation: fade-up .4s ease both;
+    }
+
+    .geo-tile:nth-child(1) { animation-delay: .05s; }
+    .geo-tile:nth-child(2) { animation-delay: .10s; }
+    .geo-tile:nth-child(3) { animation-delay: .15s; }
+    .geo-tile:nth-child(4) { animation-delay: .20s; }
+    .geo-tile:nth-child(5) { animation-delay: .25s; }
+    .geo-tile:nth-child(6) { animation-delay: .30s; }
+    .geo-tile:nth-child(7) { animation-delay: .35s; }
+    .geo-tile:nth-child(8) { animation-delay: .40s; }
+
+    .geo-city {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .geo-state {
+      font-family: 'DM Mono', monospace;
+      font-size: .62rem;
+      color: var(--ink-faint);
+      letter-spacing: .08em;
+    }
+
+    .geo-schools {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--amber);
+      line-height: 1;
+      margin-top: .3rem;
+    }
+
+    .geo-lbl {
+      font-size: .65rem;
+      color: var(--ink-faint);
+      margin-top: -.1rem;
+    }
+
+    .geo-bar {
+      height: 3px;
+      border-radius: 100px;
+      background: var(--amber);
+      margin-top: .5rem;
+      animation: bar-grow .8s ease both;
+    }
+
+    /* ────────────────────────────────────
+       STUDENT VOICES (data cards)
+    ──────────────────────────────────── */
+    .voice-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 700px) { .voice-grid { grid-template-columns: 1fr; } }
+
+    .voice-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.4rem 1.4rem 1.2rem;
+      background: var(--white);
+      animation: fade-up .5s ease both;
+    }
+
+    .voice-card:nth-child(1) { animation-delay: .1s; }
+    .voice-card:nth-child(2) { animation-delay: .2s; }
+    .voice-card:nth-child(3) { animation-delay: .3s; }
+
+    .vc-quote {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: .98rem;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--ink);
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+
+    .vc-meta {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .vc-avatar {
+      width: 2.2rem; height: 2.2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: .9rem;
+      font-style: italic;
+      font-weight: 600;
+      color: var(--white);
+      flex-shrink: 0;
+    }
+
+    .av-amber  { background: var(--amber); }
+    .av-green  { background: var(--green); }
+    .av-sky    { background: var(--sky); }
+
+    .vc-name { font-size: .82rem; font-weight: 600; color: var(--ink); }
+    .vc-role { font-size: .7rem; color: var(--ink-faint); margin-top: .1rem; }
+
+    .sentiment-bar {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-top: .9rem;
+    }
+
+    .sent-label {
+      font-family: 'DM Mono', monospace;
+      font-size: .58rem;
+      color: var(--ink-faint);
+      letter-spacing: .1em;
+      white-space: nowrap;
+    }
+
+    .sent-track {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .sent-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--green);
+      animation: bar-grow 1s .4s ease both;
+    }
+
+    /* ────────────────────────────────────
+       2-COL LAYOUT HELPERS
+    ──────────────────────────────────── */
+    .two-col-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 760px) { .two-col-grid { grid-template-columns: 1fr; } }
+
+    .three-col-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 760px) { .three-col-grid { grid-template-columns: 1fr; } }
+
+    /* ────────────────────────────────────
+       PIPELINE FUNNEL
+    ──────────────────────────────────── */
+    .funnel {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      padding: .5rem 0;
+    }
+
+    .funnel-step {
+      display: flex;
+      align-items: center;
+      gap: .9rem;
+    }
+
+    .funnel-bar-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .funnel-track {
+      height: 32px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .funnel-fill {
+      height: 100%;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding-left: .8rem;
+      animation: bar-grow .9s cubic-bezier(.22,.68,0,1.2) both;
+    }
+
+    .funnel-fill-label {
+      font-size: .72rem;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .funnel-step:nth-child(1) .funnel-fill { width: 100%; background: var(--amber);    animation-delay:.10s; }
+    .funnel-step:nth-child(2) .funnel-fill { width: 72%;  background: var(--amber-dk, #b86018); animation-delay:.18s; }
+    .funnel-step:nth-child(3) .funnel-fill { width: 48%;  background: var(--green);    animation-delay:.26s; }
+    .funnel-step:nth-child(4) .funnel-fill { width: 28%;  background: var(--sky);      animation-delay:.34s; }
+
+    .funnel-meta {
+      width: 100px;
+      flex-shrink: 0;
+    }
+
+    .funnel-num {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .funnel-label {
+      font-size: .7rem;
+      color: var(--ink-soft);
+      margin-top: .15rem;
+    }
+
+    /* ────────────────────────────────────
+       SUMMARY STRIP
+    ──────────────────────────────────── */
+    .summary-strip {
+      background: var(--navy);
+      border-radius: 10px;
+      padding: 2rem 2rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      margin-top: 1rem;
+      animation: fade-up .5s .3s ease both;
+    }
+
+    @media (max-width: 640px) { .summary-strip { grid-template-columns: 1fr 1fr; } }
+
+    .ss-item {
+      padding: 0 1.5rem;
+      border-right: 1px solid rgba(255,255,255,.1);
+      text-align: center;
+    }
+
+    .ss-item:first-child { padding-left: 0; }
+    .ss-item:last-child  { border-right: none; padding-right: 0; }
+
+    .ss-num {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--amber-lt);
+      letter-spacing: -.02em;
+      line-height: 1;
+    }
+
+    .ss-label {
+      font-family: 'DM Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+      margin-top: .45rem;
+    }
+
+    /* ────────────────────────────────────
+       DONATE SECTION
+    ──────────────────────────────────── */
+    .donate-section {
+      background: var(--navy);
+      padding: 5rem 2rem;
+      margin-top: 3rem;
+    }
+
+    .donate-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 0 3.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 700px) {
+      .donate-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .donate-divider { display: none; }
+    }
+
+    .donate-divider { background: rgba(255,255,255,.08); }
+
+    .donate-left {}
+
+    .donate-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: .62rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1rem;
+    }
+
+    .donate-h {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      margin-bottom: 1rem;
+    }
+
+    .donate-h em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--amber-lt);
+    }
+
+    .donate-p {
+      font-size: .9rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.55);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .donate-btn-row {
+      display: flex;
+      gap: .8rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-d-solid {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: .85rem 2rem;
+      background: var(--amber);
+      color: var(--navy);
+      border-radius: 4px;
+      transition: background .2s;
+      display: inline-block;
+    }
+
+    .btn-d-solid:hover { background: var(--amber-lt); }
+
+    .btn-d-ghost {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: .83rem 2rem;
+      background: transparent;
+      color: rgba(255,255,255,.6);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 4px;
+      transition: border-color .2s, color .2s;
+      display: inline-block;
+    }
+
+    .btn-d-ghost:hover { border-color: rgba(255,255,255,.55); color: #fff; }
+
+    /* right side: impact calculator */
+    .impact-table {}
+
+    .it-head {
+      font-family: 'DM Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      padding-bottom: .8rem;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      margin-bottom: .2rem;
+    }
+
+    .it-row {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1rem;
+      align-items: center;
+      padding: .85rem 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .it-row:last-child { border-bottom: none; }
+
+    .it-amt {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-style: italic;
+      color: var(--amber-lt);
+      width: 4.5rem;
+      text-align: right;
+    }
+
+    .it-bar-wrap {}
+
+    .it-desc {
+      font-size: .78rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.55);
+      line-height: 1.4;
+      margin-bottom: .4rem;
+    }
+
+    .it-track {
+      height: 4px;
+      background: rgba(255,255,255,.08);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .it-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--amber);
+      opacity: .6;
+      animation: bar-grow 1s .5s ease both;
+    }
+
+    /* ────────────────────────────────────
+       FOOTER
+    ──────────────────────────────────── */
+    footer {
+      background: var(--ink);
+      padding: 2.5rem 2rem 2rem;
+    }
+
+    .footer-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      padding-bottom: 1.6rem;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      margin-bottom: 1.4rem;
+    }
+
+    .f-logo {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.7);
+    }
+
+    .f-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .f-links a {
+      font-size: .63rem;
+      font-weight: 400;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.28);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .f-links a:hover { color: var(--amber-lt); }
+
+    .footer-base {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .8rem;
+    }
+
+    .f-advocate {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: .88rem;
+      font-style: italic;
+      color: rgba(255,255,255,.28);
+    }
+
+    .f-advocate strong { color: var(--amber); font-style: normal; }
+
+    .f-copy {
+      font-family: 'DM Mono', monospace;
+      font-size: .6rem;
+      color: rgba(255,255,255,.18);
+      letter-spacing: .08em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav>
+    <div class="nav-brand">
+      <a href="#" class="nav-logo">IMU</a>
+      <div class="nav-divider"></div>
+      <span class="nav-title">Impact Dashboard</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-tag">
+        <span class="live-dot"></span>
+        FY 2026 Data
+      </span>
+      <a href="#donate" class="nav-btn">Donate</a>
+    </div>
+  </nav>
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="page-header">
+    <div class="ph-inner">
+      <div>
+        <p class="ph-eyebrow">// Annual Impact Report</p>
+        <h1 class="ph-title">
+          Twelve years of data.<br>
+          <em>One unwavering mission.</em>
+        </h1>
+        <p class="ph-sub">
+          Inspiring Multicultural Understanding empowers students to have open
+          dialogue about culture and race in schools. Here is what that looks like
+          in numbers.
+        </p>
+      </div>
+      <div class="ph-meta">
+        <p class="ph-meta-label">Report Period</p>
+        <p class="ph-meta-val">2014 – 2026</p>
+        <p class="ph-meta-label" style="margin-top:.8rem;">Organization Type</p>
+        <p class="ph-meta-val">501(c)(3) Nonprofit</p>
+        <p class="ph-meta-label" style="margin-top:.8rem;">Status</p>
+        <p class="ph-meta-val" style="color:#4aab74;">● Active</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BODY ── -->
+  <div class="dash" style="padding-top:0; padding-bottom:3rem;">
+
+    <!-- ── KPIs ── -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Students</div>
+        <div class="kpi-number">4,200<span class="kpi-unit">+</span></div>
+        <div class="kpi-desc">Students who completed at least one IMU dialogue program</div>
+        <div class="kpi-delta up">↑ 18% YoY</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Partner Schools</div>
+        <div class="kpi-number">38</div>
+        <div class="kpi-desc">Active school partnerships across 12 cities nationwide</div>
+        <div class="kpi-delta up">↑ 6 new this year</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Years Active</div>
+        <div class="kpi-number">12</div>
+        <div class="kpi-desc">Consecutive years of uninterrupted programming since 2014</div>
+        <div class="kpi-delta high">Est. 2014</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Feel More Understood</div>
+        <div class="kpi-number">94<span class="kpi-unit">%</span></div>
+        <div class="kpi-desc">Post-program survey: students who report feeling more understood by peers</div>
+        <div class="kpi-delta up">↑ 2pts vs. prior year</div>
+      </div>
+    </div>
+
+    <!-- ── ROW 2: Growth chart + Funnel ── -->
+    <div class="section-head">
+      <span class="sh-title">Student Reach — 2014 to 2026</span>
+      <span class="sh-sub">Cumulative students served per year</span>
+    </div>
+
+    <div class="two-col-grid">
+
+      <!-- Bar chart -->
+      <div class="card bar-chart-card">
+        <div class="card-label">Annual Student Enrollment</div>
+        <div class="bar-chart">
+          <div class="bar-col">
+            <span class="bar-val">42</span>
+            <div class="bar"></div>
+            <span class="bar-year">2014</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-val">115</span>
+            <div class="bar"></div>
+            <span class="bar-year">2015</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-val">210</span>
+            <div class="bar"></div>
+            <span class="bar-year">2016</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-val">320</span>
+            <div class="bar"></div>
+            <span class="bar-year">2017</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-val">480</span>
+            <div class="bar"></div>
+            <span class="bar-year">2018</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-val">455</span>
+            <div class="bar"></div>
+            <span class="bar-year">2019</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-val">290</span>
+            <div class="bar"></div>
+            <span class="bar-year">2020</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-val">510</span>
+            <div class="bar"></div>
+            <span class="bar-year">2021</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-val">580</span>
+            <div class="bar"></div>
+            <span class="bar-year">2022</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-val">620</span>
+            <div class="bar"></div>
+            <span class="bar-year">2023</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-val">670</span>
+            <div class="bar"></div>
+            <span class="bar-year">2024</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-val">720</span>
+            <div class="bar"></div>
+            <span class="bar-year">2025</span>
+          </div>
+        </div>
+        <div class="chart-baseline"></div>
+      </div>
+
+      <!-- Funnel -->
+      <div class="card" style="animation: fade-up .5s .35s ease both;">
+        <div class="card-label">Program Engagement Funnel</div>
+        <div class="funnel">
+          <div class="funnel-step">
+            <div class="funnel-bar-wrap">
+              <div class="funnel-track">
+                <div class="funnel-fill" style="animation-delay:.10s;">
+                  <span class="funnel-fill-label">School Partners</span>
+                </div>
+              </div>
+            </div>
+            <div class="funnel-meta">
+              <div class="funnel-num">38</div>
+              <div class="funnel-label">Schools enrolled</div>
+            </div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-bar-wrap">
+              <div class="funnel-track">
+                <div class="funnel-fill" style="animation-delay:.18s;">
+                  <span class="funnel-fill-label">Students Enrolled</span>
+                </div>
+              </div>
+            </div>
+            <div class="funnel-meta">
+              <div class="funnel-num">4,200+</div>
+              <div class="funnel-label">Participants</div>
+            </div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-bar-wrap">
+              <div class="funnel-track">
+                <div class="funnel-fill" style="animation-delay:.26s;">
+                  <span class="funnel-fill-label">Completed Program</span>
+                </div>
+              </div>
+            </div>
+            <div class="funnel-meta">
+              <div class="funnel-num">3,900+</div>
+              <div class="funnel-label">Full completion</div>
+            </div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-bar-wrap">
+              <div class="funnel-track">
+                <div class="funnel-fill" style="animation-delay:.34s;">
+                  <span class="funnel-fill-label">Youth Facilitators</span>
+                </div>
+              </div>
+            </div>
+            <div class="funnel-meta">
+              <div class="funnel-num">420+</div>
+              <div class="funnel-label">Trained leaders</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── ROW 3: Donut rings ── -->
+    <div class="section-head">
+      <span class="sh-title">Post-Program Outcomes</span>
+      <span class="sh-sub">Self-reported by students, 30 days post-completion</span>
+    </div>
+
+    <div class="rings-grid">
+      <div class="card ring-card">
+        <div class="donut donut-94">
+          <div class="donut-inner">
+            <span class="donut-pct">94<span class="donut-sym">%</span></span>
+          </div>
+        </div>
+        <div class="ring-title">Feel more understood by peers</div>
+        <div class="ring-desc">The core outcome IMU is designed to produce. Measured across all 38 partner schools.</div>
+      </div>
+      <div class="card ring-card">
+        <div class="donut donut-88">
+          <div class="donut-inner">
+            <span class="donut-pct">88<span class="donut-sym">%</span></span>
+          </div>
+        </div>
+        <div class="ring-title">More comfortable discussing identity</div>
+        <div class="ring-desc">Students report increased confidence speaking about their own culture and background.</div>
+      </div>
+      <div class="card ring-card">
+        <div class="donut donut-79">
+          <div class="donut-inner">
+            <span class="donut-pct">79<span class="donut-sym">%</span></span>
+          </div>
+        </div>
+        <div class="ring-title">Greater sense of school belonging</div>
+        <div class="ring-desc">Students report feeling more connected to their school community overall.</div>
+      </div>
+    </div>
+
+    <!-- ── ROW 4: Horizontal bars + School growth table ── -->
+    <div class="section-head">
+      <span class="sh-title">Program Outcome Detail</span>
+      <span class="sh-sub">Survey responses, n = 3,412 students</span>
+    </div>
+
+    <div class="two-col-grid">
+
+      <div class="card" style="animation: fade-up .5s .2s ease both;">
+        <div class="card-label">Survey Response Breakdown</div>
+        <div class="hbar-list">
+          <div class="hbar-item">
+            <div class="hbar-top">
+              <span class="hbar-label">Feel more understood by classmates</span>
+              <span class="hbar-pct">94%</span>
+            </div>
+            <div class="hbar-track"><div class="hbar-fill c-amber" style="width:94%;"></div></div>
+          </div>
+          <div class="hbar-item">
+            <div class="hbar-top">
+              <span class="hbar-label">More likely to initiate dialogue</span>
+              <span class="hbar-pct">91%</span>
+            </div>
+            <div class="hbar-track"><div class="hbar-fill c-amber" style="width:91%;"></div></div>
+          </div>
+          <div class="hbar-item">
+            <div class="hbar-top">
+              <span class="hbar-label">Comfortable discussing cultural identity</span>
+              <span class="hbar-pct">88%</span>
+            </div>
+            <div class="hbar-track"><div class="hbar-fill c-green" style="width:88%;"></div></div>
+          </div>
+          <div class="hbar-item">
+            <div class="hbar-top">
+              <span class="hbar-label">Reduced social anxiety in class</span>
+              <span class="hbar-pct">83%</span>
+            </div>
+            <div class="hbar-track"><div class="hbar-fill c-green" style="width:83%;"></div></div>
+          </div>
+          <div class="hbar-item">
+            <div class="hbar-top">
+              <span class="hbar-label">Sense of school belonging</span>
+              <span class="hbar-pct">79%</span>
+            </div>
+            <div class="hbar-track"><div class="hbar-fill c-sky" style="width:79%;"></div></div>
+          </div>
+          <div class="hbar-item">
+            <div class="hbar-top">
+              <span class="hbar-label">Interested in becoming a facilitator</span>
+              <span class="hbar-pct">62%</span>
+            </div>
+            <div class="hbar-track"><div class="hbar-fill c-sky" style="width:62%;"></div></div>
+          </div>
+          <div class="hbar-item">
+            <div class="hbar-top">
+              <span class="hbar-label">Recommend IMU to a friend</span>
+              <span class="hbar-pct">97%</span>
+            </div>
+            <div class="hbar-track"><div class="hbar-fill c-rose" style="width:97%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="animation: fade-up .5s .3s ease both;">
+        <div class="card-label">School Partnership Growth</div>
+        <table class="growth-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Schools</th>
+              <th style="padding-left:0;"></th>
+              <th>Event</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="gt-year">2014</td>
+              <td><div class="gt-bar-wrap"><div class="gt-bar-track"><div class="gt-bar-fill" style="width:7.9%; animation-delay:.05s;"></div></div><span class="gt-num">3</span></div></td>
+              <td></td>
+              <td class="gt-milestone">↑ Founded</td>
+            </tr>
+            <tr>
+              <td class="gt-year">2015</td>
+              <td><div class="gt-bar-wrap"><div class="gt-bar-track"><div class="gt-bar-fill" style="width:13.2%; animation-delay:.1s;"></div></div><span class="gt-num">5</span></div></td>
+              <td></td>
+              <td class="gt-milestone">Peace Day 1</td>
+            </tr>
+            <tr>
+              <td class="gt-year">2016</td>
+              <td><div class="gt-bar-wrap"><div class="gt-bar-track"><div class="gt-bar-fill" style="width:21%; animation-delay:.15s;"></div></div><span class="gt-num">8</span></div></td>
+              <td></td>
+              <td class="gt-milestone">First Retreat</td>
+            </tr>
+            <tr>
+              <td class="gt-year">2018</td>
+              <td><div class="gt-bar-wrap"><div class="gt-bar-track"><div class="gt-bar-fill" style="width:36.8%; animation-delay:.2s;"></div></div><span class="gt-num">14</span></div></td>
+              <td></td>
+              <td class="gt-milestone">↑ LA Launch</td>
+            </tr>
+            <tr>
+              <td class="gt-year">2020</td>
+              <td><div class="gt-bar-wrap"><div class="gt-bar-track"><div class="gt-bar-fill" style="width:57.9%; animation-delay:.25s;"></div></div><span class="gt-num">22</span></div></td>
+              <td></td>
+              <td class="gt-milestone">Virtual pivot</td>
+            </tr>
+            <tr>
+              <td class="gt-year">2022</td>
+              <td><div class="gt-bar-wrap"><div class="gt-bar-track"><div class="gt-bar-fill" style="width:73.7%; animation-delay:.3s;"></div></div><span class="gt-num">28</span></div></td>
+              <td></td>
+              <td class="gt-milestone">Record event</td>
+            </tr>
+            <tr>
+              <td class="gt-year">2026</td>
+              <td><div class="gt-bar-wrap"><div class="gt-bar-track"><div class="gt-bar-fill" style="width:100%; animation-delay:.35s;"></div></div><span class="gt-num">38</span></div></td>
+              <td></td>
+              <td class="gt-milestone">↑ Present</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ── ROW 5: Geographic reach ── -->
+    <div class="section-head">
+      <span class="sh-title">Geographic Reach</span>
+      <span class="sh-sub">Partner schools by city</span>
+    </div>
+
+    <div class="geo-grid">
+      <div class="geo-tile">
+        <div class="geo-city">Chicago</div>
+        <div class="geo-state">IL</div>
+        <div class="geo-schools">9</div>
+        <div class="geo-lbl">schools</div>
+        <div class="geo-bar" style="width:100%;"></div>
+      </div>
+      <div class="geo-tile">
+        <div class="geo-city">Los Angeles</div>
+        <div class="geo-state">CA</div>
+        <div class="geo-schools">7</div>
+        <div class="geo-lbl">schools</div>
+        <div class="geo-bar" style="width:78%;"></div>
+      </div>
+      <div class="geo-tile">
+        <div class="geo-city">Atlanta</div>
+        <div class="geo-state">GA</div>
+        <div class="geo-schools">6</div>
+        <div class="geo-lbl">schools</div>
+        <div class="geo-bar" style="width:67%;"></div>
+      </div>
+      <div class="geo-tile">
+        <div class="geo-city">Houston</div>
+        <div class="geo-state">TX</div>
+        <div class="geo-schools">5</div>
+        <div class="geo-lbl">schools</div>
+        <div class="geo-bar" style="width:56%;"></div>
+      </div>
+      <div class="geo-tile">
+        <div class="geo-city">New York</div>
+        <div class="geo-state">NY</div>
+        <div class="geo-schools">4</div>
+        <div class="geo-lbl">schools</div>
+        <div class="geo-bar" style="width:44%;"></div>
+      </div>
+      <div class="geo-tile">
+        <div class="geo-city">Denver</div>
+        <div class="geo-state">CO</div>
+        <div class="geo-schools">3</div>
+        <div class="geo-lbl">schools</div>
+        <div class="geo-bar" style="width:33%;"></div>
+      </div>
+      <div class="geo-tile">
+        <div class="geo-city">Seattle</div>
+        <div class="geo-state">WA</div>
+        <div class="geo-schools">2</div>
+        <div class="geo-lbl">schools</div>
+        <div class="geo-bar" style="width:22%;"></div>
+      </div>
+      <div class="geo-tile">
+        <div class="geo-city">Other Cities</div>
+        <div class="geo-state">Various</div>
+        <div class="geo-schools">2</div>
+        <div class="geo-lbl">schools</div>
+        <div class="geo-bar" style="width:22%;"></div>
+      </div>
+    </div>
+
+    <!-- ── ROW 6: Summary strip ── -->
+    <div class="summary-strip">
+      <div class="ss-item">
+        <div class="ss-num">12</div>
+        <div class="ss-label">Cities Reached</div>
+      </div>
+      <div class="ss-item">
+        <div class="ss-num">420+</div>
+        <div class="ss-label">Youth Facilitators Trained</div>
+      </div>
+      <div class="ss-item">
+        <div class="ss-num">100%</div>
+        <div class="ss-label">Program Funds to Students</div>
+      </div>
+      <div class="ss-item">
+        <div class="ss-num">97%</div>
+        <div class="ss-label">Would Recommend IMU</div>
+      </div>
+    </div>
+
+    <!-- ── ROW 7: Student voices ── -->
+    <div class="section-head">
+      <span class="sh-title">Student Voices</span>
+      <span class="sh-sub">Qualitative data from program participants</span>
+    </div>
+
+    <div class="voice-grid">
+      <div class="voice-card">
+        <p class="vc-quote">"Before IMU, I never talked about being biracial at school. That circle was the first time I realized I wasn't alone. We became best friends."</p>
+        <div class="vc-meta">
+          <div class="vc-avatar av-amber">M</div>
+          <div>
+            <div class="vc-name">Maya R., 17</div>
+            <div class="vc-role">Student Participant · Chicago, IL</div>
+          </div>
+        </div>
+        <div class="sentiment-bar">
+          <span class="sent-label">Belonging score</span>
+          <div class="sent-track"><div class="sent-fill" style="width:96%;"></div></div>
+          <span class="sent-label">96</span>
+        </div>
+      </div>
+      <div class="voice-card">
+        <p class="vc-quote">"IMU was the first time my culture was spoken about with real respect. I finally felt like I belonged — not despite who I am, but because of it."</p>
+        <div class="vc-meta">
+          <div class="vc-avatar av-green">J</div>
+          <div>
+            <div class="vc-name">Javier M., 16</div>
+            <div class="vc-role">Student Leader · Los Angeles, CA</div>
+          </div>
+        </div>
+        <div class="sentiment-bar">
+          <span class="sent-label">Belonging score</span>
+          <div class="sent-track"><div class="sent-fill" style="width:98%;"></div></div>
+          <span class="sent-label">98</span>
+        </div>
+      </div>
+      <div class="voice-card">
+        <p class="vc-quote">"IMU didn't just change my school — it changed who I am. I now run dialogue circles myself. I found my vocation at seventeen."</p>
+        <div class="vc-meta">
+          <div class="vc-avatar av-sky">A</div>
+          <div>
+            <div class="vc-name">Aisha T., 18</div>
+            <div class="vc-role">Youth Facilitator · Atlanta, GA</div>
+          </div>
+        </div>
+        <div class="sentiment-bar">
+          <span class="sent-label">Belonging score</span>
+          <div class="sent-track"><div class="sent-fill" style="width:100%;"></div></div>
+          <span class="sent-label">100</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dash -->
+
+  <!-- ── DONATE ── -->
+  <section class="donate-section" id="donate">
+    <div class="donate-inner">
+      <div class="donate-left">
+        <p class="donate-eyebrow">// Support the Work</p>
+        <h2 class="donate-h">
+          The data is clear.<br>
+          <em>Help us reach more.</em>
+        </h2>
+        <p class="donate-p">
+          Every number on this dashboard represents a student who sat in a circle
+          and found something they didn't know they were missing.
+          Your gift adds to that data — and more importantly, to that experience.
+        </p>
+        <div class="donate-btn-row">
+          <a href="#" class="btn-d-solid">Donate Now</a>
+          <a href="#" class="btn-d-ghost">Volunteer</a>
+        </div>
+      </div>
+      <div class="donate-divider"></div>
+      <div class="donate-right">
+        <div class="it-head">Your Gift at Work</div>
+        <div class="it-row">
+          <div class="it-amt">$25</div>
+          <div class="it-bar-wrap">
+            <div class="it-desc">Supplies one student with a full semester of dialogue materials</div>
+            <div class="it-track"><div class="it-fill" style="width:25%;"></div></div>
+          </div>
+        </div>
+        <div class="it-row">
+          <div class="it-amt">$100</div>
+          <div class="it-bar-wrap">
+            <div class="it-desc">Funds a complete dialogue circle session for 15 students</div>
+            <div class="it-track"><div class="it-fill" style="width:50%;"></div></div>
+          </div>
+        </div>
+        <div class="it-row">
+          <div class="it-amt">$250</div>
+          <div class="it-bar-wrap">
+            <div class="it-desc">Sponsors a youth facilitator through full leadership training</div>
+            <div class="it-track"><div class="it-fill" style="width:70%;"></div></div>
+          </div>
+        </div>
+        <div class="it-row">
+          <div class="it-amt">$1,000</div>
+          <div class="it-bar-wrap">
+            <div class="it-desc">Launches a new school partnership for an entire semester</div>
+            <div class="it-track"><div class="it-fill" style="width:100%;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-inner">
+      <span class="f-logo">IMU — Inspiring Multicultural Understanding</span>
+      <div class="f-links">
+        <a href="#">About</a>
+        <a href="#">Programs</a>
+        <a href="#">Data &amp; Reports</a>
+        <a href="#">Schools</a>
+        <a href="#">Volunteer</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="footer-base">
+      <p class="f-advocate">
+        Advocated by <strong>Elaine</strong>, IMU Advisory Board Member.
+      </p>
+      <p class="f-copy">© 2026 IMU · 501(c)(3) · FY2026 Impact Report</p>
+    </div>
+  </footer>
+
+</body>
+</html>

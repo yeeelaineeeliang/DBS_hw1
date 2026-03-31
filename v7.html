@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Letter — IMU</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Caveat+Brush&family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper:       #faf8f0;
+      --paper-dark:  #f0ece0;
+      --paper-aged:  #e8e0cc;
+      --line:        #ddd5c0;
+      --line-margin: #e0b8b0;
+      --ink:         #2a2018;
+      --ink-mid:     #4a3c28;
+      --ink-faint:   #9a8c78;
+      --red-margin:  #c8605a;
+      --blue-ink:    #2a3a6a;
+      --pencil:      #7a7060;
+      --line-height-px: 36px;
+    }
+
+    html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+    body {
+      background: #d8d0c0;
+      background-image:
+        radial-gradient(ellipse at 20% 20%, #c8bfaa 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 80%, #b8b0a0 0%, transparent 50%);
+      min-height: 100vh;
+      padding: 3rem 1rem 5rem;
+      font-family: 'Lora', Georgia, serif;
+    }
+
+    /* ── DESK SHADOW ── */
+    .desk {
+      max-width: 740px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* ── STICKY NOTE (top corner) ── */
+    .sticky {
+      position: absolute;
+      top: -1.2rem;
+      right: 3rem;
+      width: 130px;
+      background: #ffe97a;
+      padding: .9rem .8rem .8rem;
+      box-shadow: 2px 3px 8px rgba(0,0,0,.18), 0 1px 2px rgba(0,0,0,.1);
+      transform: rotate(3.5deg);
+      z-index: 10;
+      font-family: 'Caveat', cursive;
+      font-size: .95rem;
+      font-weight: 500;
+      color: #3a2a10;
+      line-height: 1.45;
+    }
+
+    .sticky::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: rgba(0,0,0,.06);
+    }
+
+    /* ── PAPER SHEET ── */
+    .paper {
+      background: var(--paper);
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 2px 4px rgba(0,0,0,.08),
+        0 8px 24px rgba(0,0,0,.12),
+        0 20px 60px rgba(0,0,0,.10);
+    }
+
+    /* horizontal ruled lines */
+    .paper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent calc(var(--line-height-px) - 1px),
+        var(--line) calc(var(--line-height-px) - 1px),
+        var(--line) var(--line-height-px)
+      );
+      background-position: 0 72px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* red margin line */
+    .paper::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 88px;
+      width: 1.5px;
+      background: var(--line-margin);
+      opacity: .7;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .paper-inner {
+      position: relative;
+      z-index: 2;
+      padding: 3.5rem 3rem 3.5rem 6.5rem;
+    }
+
+    /* ── HEADER AREA ── */
+    .letter-header {
+      margin-bottom: 2.8rem;
+    }
+
+    .letter-date {
+      font-family: 'Caveat', cursive;
+      font-size: 1.05rem;
+      color: var(--ink-mid);
+      line-height: var(--line-height-px);
+      margin-bottom: 0;
+      display: block;
+    }
+
+    .letter-org {
+      font-family: 'Caveat', cursive;
+      font-size: .88rem;
+      color: var(--ink-faint);
+      line-height: var(--line-height-px);
+    }
+
+    /* ── SALUTATION ── */
+    .salutation {
+      font-family: 'Caveat', cursive;
+      font-size: 1.45rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: var(--line-height-px);
+      margin-bottom: var(--line-height-px);
+    }
+
+    /* ── BODY TEXT ── */
+    .letter-body p {
+      font-family: 'Caveat', cursive;
+      font-size: 1.18rem;
+      font-weight: 400;
+      color: var(--ink);
+      line-height: var(--line-height-px);
+      margin-bottom: var(--line-height-px);
+    }
+
+    .letter-body p.indent {
+      text-indent: 2.2em;
+    }
+
+    /* emphasis — slightly bolder, different pen pressure */
+    .letter-body em {
+      font-style: normal;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    /* underline in blue ink */
+    .underline-blue {
+      text-decoration: underline;
+      text-decoration-color: var(--blue-ink);
+      text-decoration-thickness: 1.5px;
+      text-underline-offset: 3px;
+      color: var(--blue-ink);
+      font-weight: 600;
+    }
+
+    /* ── MARGIN ANNOTATIONS ── */
+    .margin-note {
+      position: absolute;
+      left: .8rem;
+      width: 70px;
+      font-family: 'Caveat', cursive;
+      font-size: .78rem;
+      color: var(--red-margin);
+      line-height: 1.3;
+      text-align: center;
+      transform: rotate(-90deg);
+      transform-origin: center;
+    }
+
+    .margin-star {
+      position: absolute;
+      left: 64px;
+      font-family: 'Caveat', cursive;
+      font-size: 1.1rem;
+      color: var(--red-margin);
+    }
+
+    .margin-arrow {
+      position: absolute;
+      left: 64px;
+      font-family: 'Caveat', cursive;
+      font-size: .95rem;
+      color: var(--pencil);
+      font-style: italic;
+    }
+
+    /* ── CIRCLED / BOXED WORD ── */
+    .circled {
+      display: inline;
+      border-bottom: 2px solid var(--red-margin);
+      border-radius: 40%;
+      padding: 0 .1em;
+      color: var(--red-margin);
+      font-weight: 600;
+    }
+
+    /* ── SECTION BREAK — doodle line ── */
+    .doodle-break {
+      margin: calc(var(--line-height-px) * .5) 0;
+      height: var(--line-height-px);
+      display: flex;
+      align-items: center;
+    }
+
+    .doodle-break svg {
+      width: 140px;
+      height: 18px;
+      overflow: visible;
+    }
+
+    /* ── TESTIMONIAL BLOCKS ── */
+    .letter-quote {
+      position: relative;
+      margin: calc(var(--line-height-px) * .5) 0 var(--line-height-px);
+      padding: 0 0 0 1.4rem;
+      border-left: 2.5px solid var(--pencil);
+    }
+
+    .letter-quote p {
+      font-family: 'Caveat', cursive;
+      font-size: 1.12rem;
+      font-style: italic;
+      color: var(--ink-mid);
+      line-height: var(--line-height-px);
+      margin-bottom: 0 !important;
+    }
+
+    .letter-quote .q-attr {
+      font-family: 'Caveat', cursive;
+      font-size: .9rem;
+      color: var(--ink-faint);
+      line-height: var(--line-height-px);
+      padding-left: .5rem;
+    }
+
+    /* ── STATS INLINE ── */
+    .stats-inline {
+      display: flex;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      margin: var(--line-height-px) 0;
+      padding: calc(var(--line-height-px) * .8) 1.2rem;
+      border: 1.5px solid var(--line);
+      background: rgba(255,255,255,.5);
+      position: relative;
+    }
+
+    .stats-inline::before {
+      content: 'our numbers ↓';
+      position: absolute;
+      top: -1.1rem;
+      left: 1rem;
+      font-family: 'Caveat', cursive;
+      font-size: .85rem;
+      color: var(--pencil);
+      background: var(--paper);
+      padding: 0 .4rem;
+    }
+
+    .stat-inline-item {}
+
+    .stat-inline-num {
+      font-family: 'Caveat', cursive;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--blue-ink);
+      line-height: 1;
+    }
+
+    .stat-inline-lbl {
+      font-family: 'Caveat', cursive;
+      font-size: .85rem;
+      color: var(--ink-faint);
+      margin-top: .2rem;
+    }
+
+    /* ── DONATE SECTION — different paper (torn sticky / note card) ── */
+    .donate-card {
+      margin-top: 2rem;
+      background: #f5f0e8;
+      border: 1.5px solid var(--line);
+      padding: 2.4rem 2rem 2rem 5.5rem;
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.6);
+    }
+
+    /* lined background for the donate card too */
+    .donate-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent calc(var(--line-height-px) - 1px),
+        rgba(180,170,150,.3) calc(var(--line-height-px) - 1px),
+        rgba(180,170,150,.3) var(--line-height-px)
+      );
+      background-position: 0 0;
+      pointer-events: none;
+    }
+
+    .donate-card::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 88px;
+      width: 1.5px;
+      background: var(--line-margin);
+      opacity: .4;
+    }
+
+    .donate-card-inner { position: relative; z-index: 2; }
+
+    .donate-tag {
+      font-family: 'Caveat', cursive;
+      font-size: .88rem;
+      color: var(--red-margin);
+      font-style: italic;
+      margin-bottom: calc(var(--line-height-px) * .5);
+      display: block;
+    }
+
+    .donate-head {
+      font-family: 'Caveat', cursive;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.25;
+      margin-bottom: var(--line-height-px);
+    }
+
+    .donate-body p {
+      font-family: 'Caveat', cursive;
+      font-size: 1.1rem;
+      color: var(--ink-mid);
+      line-height: var(--line-height-px);
+      margin-bottom: var(--line-height-px);
+    }
+
+    .impact-lines {
+      margin: var(--line-height-px) 0;
+    }
+
+    .impact-line {
+      font-family: 'Caveat', cursive;
+      font-size: 1.05rem;
+      color: var(--ink-mid);
+      line-height: var(--line-height-px);
+      display: flex;
+      gap: .8rem;
+      align-items: baseline;
+    }
+
+    .impact-line .amt {
+      font-weight: 700;
+      color: var(--blue-ink);
+      min-width: 3.5rem;
+    }
+
+    .impact-line::before {
+      content: '→';
+      color: var(--pencil);
+      flex-shrink: 0;
+    }
+
+    .donate-btns {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: calc(var(--line-height-px) * .5);
+    }
+
+    .btn-letter {
+      font-family: 'Caveat', cursive;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-decoration: none;
+      padding: .5rem 1.8rem;
+      display: inline-block;
+      cursor: pointer;
+      transition: transform .12s;
+      border-radius: 3px;
+    }
+
+    .btn-letter:hover { transform: rotate(-1deg) translateY(-2px); }
+
+    .btn-primary-letter {
+      background: var(--blue-ink);
+      color: #fff;
+      box-shadow: 2px 3px 0 rgba(0,0,0,.2);
+    }
+
+    .btn-secondary-letter {
+      color: var(--blue-ink);
+      border-bottom: 2px solid var(--blue-ink);
+      padding-left: 0; padding-right: 0;
+    }
+
+    /* ── SIGN-OFF ── */
+    .sign-off {
+      margin-top: var(--line-height-px);
+    }
+
+    .sign-off .closing {
+      font-family: 'Caveat', cursive;
+      font-size: 1.18rem;
+      color: var(--ink);
+      line-height: var(--line-height-px);
+    }
+
+    .signature-block {
+      margin-top: calc(var(--line-height-px) * .5);
+    }
+
+    .signature-main {
+      font-family: 'Caveat Brush', 'Caveat', cursive;
+      font-size: 2.2rem;
+      color: var(--blue-ink);
+      line-height: 1.15;
+      letter-spacing: .01em;
+    }
+
+    .signature-names {
+      font-family: 'Caveat', cursive;
+      font-size: 1rem;
+      color: var(--ink-faint);
+      line-height: 1.55;
+      margin-top: .4rem;
+    }
+
+    /* ── ELAINE POSTSCRIPT ── */
+    .ps-block {
+      margin-top: calc(var(--line-height-px) * 1.5);
+      padding-top: var(--line-height-px);
+      border-top: 1px dashed var(--line);
+    }
+
+    .ps-label {
+      font-family: 'Caveat', cursive;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: var(--line-height-px);
+    }
+
+    .ps-text {
+      font-family: 'Caveat', cursive;
+      font-size: 1.05rem;
+      color: var(--ink-mid);
+      line-height: var(--line-height-px);
+    }
+
+    .ps-sig {
+      font-family: 'Caveat Brush', 'Caveat', cursive;
+      font-size: 1.5rem;
+      color: var(--blue-ink);
+      margin-top: .4rem;
+      display: block;
+    }
+
+    .ps-title {
+      font-family: 'Caveat', cursive;
+      font-size: .88rem;
+      color: var(--ink-faint);
+      display: block;
+    }
+
+    /* ── FOOTER / ENVELOPE FLAP ── */
+    .envelope-footer {
+      margin-top: 3rem;
+      text-align: center;
+    }
+
+    .envelope-footer p {
+      font-family: 'Caveat', cursive;
+      font-size: .88rem;
+      color: rgba(80,70,55,.55);
+      line-height: 1.7;
+    }
+
+    .envelope-footer a {
+      color: rgba(80,70,55,.55);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(80,70,55,.25);
+    }
+
+    /* ── PAPER CLIP ── */
+    .paperclip {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      z-index: 20;
+    }
+
+    /* ── FOLDED CORNER ── */
+    .fold {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 0 42px 42px;
+      border-color: transparent transparent var(--paper-aged) transparent;
+      filter: drop-shadow(-2px -2px 3px rgba(0,0,0,.08));
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      body { padding: 1.5rem .5rem 4rem; }
+      .paper-inner { padding: 2.5rem 1.5rem 2.5rem 4.5rem; }
+      .paper::after { left: 60px; }
+      .donate-card { padding-left: 4rem; }
+      .donate-card::after { left: 60px; }
+      .sticky { right: .5rem; top: -.8rem; width: 110px; font-size: .85rem; }
+      .stats-inline { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="desk">
+
+    <!-- sticky note -->
+    <div class="sticky">
+      please<br>read this.<br>it matters. 🙏
+    </div>
+
+    <!-- ── PAPER ── -->
+    <div class="paper">
+
+      <!-- paperclip SVG -->
+      <svg class="paperclip" viewBox="0 0 28 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 2C8.48 2 4 6.48 4 12v26c0 7.73 6.27 14 14 14s14-6.27 14-14V10" stroke="#aaa" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path d="M22 10V38c0 4.42-3.58 8-8 8s-8-3.58-8-8V12c0-2.21 1.79-4 4-4s4 1.79 4 4v26" stroke="#bbb" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      </svg>
+
+      <div class="paper-inner">
+
+        <!-- ── HEADER ── -->
+        <div class="letter-header">
+          <span class="letter-date">Spring 2026</span>
+          <span class="letter-org">Inspiring Multicultural Understanding — imu.org</span>
+        </div>
+
+        <!-- ── SALUTATION ── -->
+        <div class="salutation">
+          To whoever is reading this —
+        </div>
+
+        <!-- ── BODY ── -->
+        <div class="letter-body">
+
+          <p class="indent">
+            I want to tell you about the day I finally said something out loud that
+            I had been carrying around in silence for years.
+          </p>
+
+          <p class="indent">
+            I was sitting in a circle with fourteen other students — people I passed
+            in the hallway every day without really seeing. And someone asked a question
+            that no teacher had ever asked me before. She asked: <em>"What part of who
+            you are do you leave at the door when you walk into school?"</em>
+          </p>
+
+          <p class="indent" style="position:relative;">
+            <span class="margin-star" style="top: 4px;">★</span>
+            I didn't answer right away. I looked around the room. And then — one by one —
+            I watched every single person in that circle start to answer. Quietly, then
+            a little louder. Some of them cried. <em>I cried.</em> And it felt like
+            something that had been held very tightly finally let go.
+          </p>
+
+          <p class="indent">
+            That was my first IMU dialogue circle. I was sixteen.
+          </p>
+
+          <div class="doodle-break" aria-hidden="true">
+            <svg viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 12 Q12 4 22 12 Q32 20 42 12 Q52 4 62 12 Q72 20 82 12 Q92 4 102 12 Q112 20 122 12 Q132 4 138 10" stroke="#c8b890" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+
+          <p class="indent">
+            My name is Aisha. I'm eighteen now, and I'm writing this because I want
+            you to understand what IMU — <span class="underline-blue">Inspiring Multicultural Understanding</span> —
+            actually is. Not in the way a brochure explains it. In the way it felt
+            to be a student who needed it.
+          </p>
+
+          <p class="indent">
+            It is a youth nonprofit. It's been running for twelve years. It works
+            with schools to create spaces where students can talk honestly about
+            culture, race, and identity — things that shape every single day of a
+            young person's life, but that most schools treat like dangerous territory.
+          </p>
+
+          <p class="indent" style="position:relative;">
+            <span class="margin-arrow" style="top: 6px; font-size:.82rem; color: var(--red-margin);">this.</span>
+            <span class="margin-arrow" style="top: 42px; font-size:.82rem; color: var(--red-margin);">↑</span>
+            IMU doesn't treat it like dangerous territory. IMU treats it like
+            <em>necessary</em> territory. Like the most important conversation
+            a school could possibly make room for.
+          </p>
+
+          <div class="doodle-break" aria-hidden="true">
+            <svg viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 12 Q12 4 22 12 Q32 20 42 12 Q52 4 62 12 Q72 20 82 12 Q92 4 102 12 Q112 20 122 12 Q132 4 138 10" stroke="#c8b890" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+
+          <p>
+            Here is what it has done — in numbers, because sometimes you need those:
+          </p>
+
+          <div class="stats-inline">
+            <div class="stat-inline-item">
+              <div class="stat-inline-num">4,200+</div>
+              <div class="stat-inline-lbl">students reached</div>
+            </div>
+            <div class="stat-inline-item">
+              <div class="stat-inline-num">38</div>
+              <div class="stat-inline-lbl">partner schools</div>
+            </div>
+            <div class="stat-inline-item">
+              <div class="stat-inline-num">12</div>
+              <div class="stat-inline-lbl">years running</div>
+            </div>
+            <div class="stat-inline-item">
+              <div class="stat-inline-num">94%</div>
+              <div class="stat-inline-lbl">feel more understood</div>
+            </div>
+          </div>
+
+          <p class="indent">
+            But the number I think about most is not on that list. It's the number
+            of students who walked into a room feeling invisible and walked out
+            feeling, for the first time, like themselves.
+          </p>
+
+          <p class="indent">
+            I want you to hear it from some of them directly:
+          </p>
+
+          <div class="letter-quote">
+            <p>"Before IMU, I never talked about being biracial at school.
+            I thought no one would understand. In my first dialogue circle,
+            a girl I barely knew started crying because she felt the exact
+            same way. We became best friends."</p>
+            <p class="q-attr">— Maya, 17 &nbsp;·&nbsp; Chicago, IL</p>
+          </div>
+
+          <div class="letter-quote">
+            <p>"I grew up in a mostly white school and never saw my culture
+            reflected anywhere. IMU was the first time I heard my language
+            and my traditions spoken about with real respect. I finally felt
+            like I belonged — not despite who I am, but because of it."</p>
+            <p class="q-attr">— Javier, 16 &nbsp;·&nbsp; Los Angeles, CA</p>
+          </div>
+
+          <p class="indent">
+            I could keep going. I have a hundred more of these. Every single one
+            of them is a real person who sat in a circle and found something they
+            didn't know they were missing.
+          </p>
+
+          <div class="doodle-break" aria-hidden="true">
+            <svg viewBox="0 0 140 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 12 Q12 4 22 12 Q32 20 42 12 Q52 4 62 12 Q72 20 82 12 Q92 4 102 12 Q112 20 122 12 Q132 4 138 10" stroke="#c8b890" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+
+          <p class="indent">
+            Here is what I need to ask you:
+          </p>
+
+          <p class="indent">
+            I was lucky. My school said yes to IMU. A lot of schools — most schools —
+            have not said yes yet. And the only thing standing between those students
+            and a circle like the one I sat in is <em>resources.</em>
+          </p>
+
+          <p class="indent">
+            Which means it's partly standing between them and you.
+          </p>
+
+          <p class="indent">
+            I know that sounds like a lot to put on a stranger. But you're reading
+            this letter. That means something to me. It means you're already paying
+            attention. And paying attention is how everything that ever mattered
+            actually started.
+          </p>
+
+          <p class="indent">
+            If you can give something — anything — please do. And if you can't,
+            then share this. Tell someone. Say IMU out loud to one person who
+            might care. That matters too.
+          </p>
+
+          <p class="indent">
+            Every student deserves to be seen.
+            <em>I really, genuinely believe that.</em>
+            I hope after reading this, you do too.
+          </p>
+
+        </div><!-- /letter-body -->
+
+        <!-- ── SIGN OFF ── -->
+        <div class="sign-off">
+          <p class="closing">With everything I have,</p>
+          <div class="signature-block">
+            <div class="signature-main">Aisha, Maya, Javier,<br>& the IMU community</div>
+            <div class="signature-names">
+              Students, facilitators, educators, and families<br>
+              across 38 schools in 12 cities
+            </div>
+          </div>
+        </div>
+
+        <!-- ── DONATE CARD ── -->
+        <div class="donate-card" id="give">
+          <div class="donate-card-inner">
+            <span class="donate-tag">P.S. — one more thing</span>
+            <h2 class="donate-head">Here's how to help,<br>concretely.</h2>
+            <div class="donate-body">
+              <p>
+                We are a 501(c)(3) nonprofit. Every dollar goes directly to
+                programs — dialogue workshops, facilitator training, and bringing
+                IMU into schools that need it.
+              </p>
+            </div>
+            <div class="impact-lines">
+              <div class="impact-line"><span class="amt">$25</span> supplies one student with a full semester of dialogue materials</div>
+              <div class="impact-line"><span class="amt">$100</span> funds a complete dialogue circle session for up to 15 students</div>
+              <div class="impact-line"><span class="amt">$250</span> sponsors a youth facilitator through our full leadership training</div>
+              <div class="impact-line"><span class="amt">$1,000</span> brings IMU into a new partner school for an entire semester</div>
+            </div>
+            <div class="donate-btns">
+              <a href="#" class="btn-letter btn-primary-letter">Donate</a>
+              <a href="#" class="btn-letter btn-secondary-letter">Volunteer instead</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ELAINE P.P.S. ── -->
+        <div class="ps-block">
+          <p class="ps-label">P.P.S.</p>
+          <p class="ps-text">
+            I want to add my own word here. I've been on the IMU Advisory Board
+            for several years now, and I have watched this organization do exactly
+            what it promises — quietly, consistently, without fanfare.
+            The students in these circles are not statistics.
+            They are the reason this work has to continue.
+          </p>
+          <span class="ps-sig">Elaine</span>
+          <span class="ps-title">IMU Advisory Board Member</span>
+        </div>
+
+      </div><!-- /paper-inner -->
+
+      <!-- folded corner -->
+      <div class="fold"></div>
+
+    </div><!-- /paper -->
+
+    <!-- ── ENVELOPE FOOTER ── -->
+    <div class="envelope-footer">
+      <p>
+        Inspiring Multicultural Understanding &nbsp;·&nbsp; est. 2014 &nbsp;·&nbsp; 501(c)(3) nonprofit<br>
+        <a href="#">imu.org</a> &nbsp;·&nbsp; <a href="#">@imu</a>
+      </p>
+    </div>
+
+  </div><!-- /desk -->
+
+</body>
+</html>

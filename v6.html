@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMU — Every Student Deserves to Be Seen</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sand:    #f5ede0;
+      --clay:    #c4815a;
+      --ember:   #a0432a;
+      --dusk:    #2e1f14;
+      --fog:     #e8ddd0;
+      --ink:     #1c120a;
+      --caption: rgba(28,18,10,.55);
+    }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+    body {
+      background: var(--sand);
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.4rem 2.5rem;
+      background: linear-gradient(to bottom, rgba(28,18,10,.55) 0%, transparent 100%);
+      transition: background .4s;
+    }
+
+    nav.scrolled {
+      background: rgba(46,31,20,.92);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-right a {
+      font-size: .68rem;
+      font-weight: 500;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.65);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .nav-right a:hover { color: #fff; }
+
+    .nav-donate {
+      font-size: .65rem !important;
+      font-weight: 600 !important;
+      letter-spacing: .16em;
+      color: var(--ink) !important;
+      background: #fff;
+      padding: .5rem 1.3rem;
+      transition: background .2s, color .2s !important;
+    }
+
+    .nav-donate:hover {
+      background: var(--clay) !important;
+      color: #fff !important;
+    }
+
+    /* ── HERO — full viewport ── */
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 560px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    .hero-img {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(160deg,
+          #c4815a 0%,
+          #a0432a 30%,
+          #6b2d1a 60%,
+          #2e1f14 100%);
+    }
+
+    /* warm light leak */
+    .hero-img::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 30% 40%, rgba(220,160,90,.35) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 50% at 75% 70%, rgba(160,67,42,.3) 0%, transparent 60%);
+    }
+
+    /* grain */
+    .hero-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+      opacity: .5;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(28,18,10,.82) 0%, rgba(28,18,10,.1) 55%, transparent 100%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 4rem 2.5rem 5rem;
+      max-width: 900px;
+    }
+
+    .hero-eyebrow {
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-headline {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.0;
+      color: #fff;
+      letter-spacing: -.01em;
+      margin-bottom: 1.6rem;
+    }
+
+    .hero-sub {
+      font-size: .9rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.65);
+      max-width: 420px;
+      line-height: 1.75;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 2.2rem;
+      right: 2.5rem;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-size: .62rem;
+      font-weight: 500;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+    }
+
+    .scroll-line {
+      width: 36px;
+      height: 1px;
+      background: rgba(255,255,255,.25);
+    }
+
+    /* ── PHOTO ESSAY LAYOUT ── */
+
+    /* full-bleed photo */
+    .photo-full {
+      position: relative;
+      width: 100%;
+    }
+
+    .photo-full .img {
+      width: 100%;
+      display: block;
+    }
+
+    /* caption bar */
+    .caption-bar {
+      background: var(--dusk);
+      padding: 1.4rem 2.5rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1.8rem;
+    }
+
+    .cap-num {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.5rem;
+      font-style: italic;
+      color: var(--clay);
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .cap-text {
+      font-size: .82rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.6);
+      line-height: 1.65;
+      max-width: 680px;
+    }
+
+    .cap-text strong {
+      color: rgba(255,255,255,.9);
+      font-weight: 500;
+    }
+
+    /* two-up photos */
+    .photo-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .photo-pair .pane {
+      position: relative;
+    }
+
+    .photo-pair .pane .img { width: 100%; display: block; }
+
+    /* inline caption (over-image) */
+    .over-caption {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 2.5rem 2rem 1.5rem;
+      background: linear-gradient(to top, rgba(28,18,10,.78) 0%, transparent 100%);
+    }
+
+    .over-caption .name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.2rem;
+      font-style: italic;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: .25rem;
+    }
+
+    .over-caption .role {
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.45);
+    }
+
+    /* three-up */
+    .photo-trio {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .photo-trio .pane .img { width: 100%; display: block; }
+
+    /* text interlude */
+    .interlude {
+      background: var(--fog);
+      padding: 6rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .interlude-inner {
+      max-width: 640px;
+      text-align: center;
+    }
+
+    .interlude-label {
+      font-size: .63rem;
+      font-weight: 500;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--clay);
+      margin-bottom: 1.6rem;
+    }
+
+    .interlude-quote {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--dusk);
+      line-height: 1.4;
+      margin-bottom: 1.8rem;
+    }
+
+    .interlude-body {
+      font-size: .9rem;
+      font-weight: 300;
+      color: var(--caption);
+      line-height: 1.9;
+    }
+
+    /* split: text + tall photo */
+    .split-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 600px;
+    }
+
+    .split-text {
+      background: var(--dusk);
+      padding: 5rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .split-text .st-label {
+      font-size: .63rem;
+      font-weight: 500;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--clay);
+      margin-bottom: 1.4rem;
+    }
+
+    .split-text h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 300;
+      font-style: italic;
+      color: #fff;
+      line-height: 1.25;
+      margin-bottom: 1.6rem;
+    }
+
+    .split-text p {
+      font-size: .88rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.55);
+      line-height: 1.85;
+    }
+
+    .split-text p + p { margin-top: 1em; }
+
+    .split-photo { position: relative; }
+    .split-photo .img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* stats overlay */
+    .stats-row {
+      display: flex;
+      gap: 0;
+      border-top: 1px solid rgba(255,255,255,.08);
+      margin-top: 3rem;
+      padding-top: 2rem;
+    }
+
+    .st-stat {
+      flex: 1;
+      padding-right: 1.8rem;
+      border-right: 1px solid rgba(255,255,255,.1);
+      margin-right: 1.8rem;
+    }
+
+    .st-stat:last-child { border-right: none; margin-right: 0; padding-right: 0; }
+
+    .st-num {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: #fff;
+      line-height: 1;
+      letter-spacing: -.02em;
+    }
+
+    .st-lbl {
+      font-size: .62rem;
+      font-weight: 400;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      margin-top: .4rem;
+    }
+
+    /* testimony full-bleed */
+    .testimony-full {
+      position: relative;
+      min-height: 75vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .testimony-full .tf-img {
+      position: absolute;
+      inset: 0;
+    }
+
+    .testimony-full .tf-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, rgba(28,18,10,.88) 40%, rgba(28,18,10,.2) 100%);
+    }
+
+    .tf-content {
+      position: relative;
+      z-index: 2;
+      padding: 5rem 2.5rem;
+      max-width: 560px;
+    }
+
+    .tf-quote {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 300;
+      font-style: italic;
+      color: #fff;
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+
+    .tf-attr-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--clay);
+    }
+
+    .tf-attr-role {
+      font-size: .63rem;
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      margin-top: .3rem;
+    }
+
+    /* donate section */
+    .donate-section {
+      position: relative;
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .donate-section .ds-img {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg,
+        #7a3520 0%,
+        #a0432a 25%,
+        #c4815a 55%,
+        #e8b07a 80%,
+        #f5d4a8 100%);
+    }
+
+    .donate-section .ds-img::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(255,200,120,.18) 0%, transparent 70%);
+    }
+
+    .ds-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(28,18,10,.52);
+    }
+
+    .ds-content {
+      position: relative;
+      z-index: 2;
+      padding: 4rem 2rem;
+      max-width: 600px;
+    }
+
+    .ds-label {
+      font-size: .63rem;
+      font-weight: 500;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.45);
+      margin-bottom: 1.6rem;
+    }
+
+    .ds-headline {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      font-weight: 300;
+      font-style: italic;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 1.2rem;
+      letter-spacing: -.01em;
+    }
+
+    .ds-body {
+      font-size: .88rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.65);
+      line-height: 1.85;
+      max-width: 420px;
+      margin: 0 auto 3rem;
+    }
+
+    .ds-btns {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-film {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: .9rem 2.4rem;
+      transition: background .2s, color .2s, border-color .2s;
+      display: inline-block;
+    }
+
+    .btn-film-solid {
+      background: #fff;
+      color: var(--dusk);
+      border: 1px solid #fff;
+    }
+
+    .btn-film-solid:hover { background: var(--clay); border-color: var(--clay); color: #fff; }
+
+    .btn-film-ghost {
+      background: transparent;
+      color: rgba(255,255,255,.7);
+      border: 1px solid rgba(255,255,255,.35);
+    }
+
+    .btn-film-ghost:hover { border-color: #fff; color: #fff; }
+
+    /* impact grid over donate */
+    .ds-impact {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .ds-impact-item {
+      text-align: center;
+    }
+
+    .ds-impact-amt {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.6rem;
+      font-style: italic;
+      color: rgba(255,230,180,.9);
+      line-height: 1;
+    }
+
+    .ds-impact-desc {
+      font-size: .7rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.45);
+      margin-top: .35rem;
+      max-width: 120px;
+      line-height: 1.4;
+    }
+
+    /* footer */
+    footer {
+      background: var(--dusk);
+      padding: 3rem 2.5rem 2rem;
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      margin-bottom: 1.8rem;
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.3rem;
+      font-weight: 400;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.8);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.8rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-size: .65rem;
+      font-weight: 400;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .footer-links a:hover { color: rgba(255,255,255,.7); }
+
+    .footer-base {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-advocate {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: .95rem;
+      font-style: italic;
+      color: rgba(255,255,255,.3);
+    }
+
+    .footer-advocate strong {
+      color: var(--clay);
+      font-style: normal;
+    }
+
+    .footer-copy {
+      font-size: .62rem;
+      font-weight: 300;
+      letter-spacing: .1em;
+      color: rgba(255,255,255,.18);
+    }
+
+    /* ── IMAGE PLACEHOLDER HELPERS ── */
+
+    /* each .img is a styled div acting as the photo */
+    .img { display: block; }
+
+    /* Scene 1 — students in a circle, warm amber classroom */
+    .scene-circle {
+      height: 72vh;
+      min-height: 420px;
+      background:
+        radial-gradient(ellipse 55% 60% at 50% 48%, rgba(220,155,80,.45) 0%, transparent 65%),
+        linear-gradient(170deg, #c97d3a 0%, #8b3d18 45%, #2e1f14 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scene-circle::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle 3px at 28% 45%, rgba(255,200,100,.6) 0%, transparent 2%),
+                  radial-gradient(circle 4px at 50% 55%, rgba(255,200,100,.5) 0%, transparent 2%),
+                  radial-gradient(circle 3px at 72% 47%, rgba(255,200,100,.6) 0%, transparent 2%),
+                  radial-gradient(circle 3px at 38% 58%, rgba(255,200,100,.5) 0%, transparent 2%),
+                  radial-gradient(circle 3px at 62% 60%, rgba(255,200,100,.4) 0%, transparent 2%);
+    }
+
+    /* Scene 2 — hallway conversation, side light */
+    .scene-hallway {
+      height: 500px;
+      background: linear-gradient(120deg, #1a0e08 0%, #5c2a12 40%, #a06030 75%, #c89060 100%);
+      position: relative;
+    }
+
+    .scene-hallway::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 30% 80% at 72% 50%, rgba(230,160,80,.3) 0%, transparent 60%);
+    }
+
+    /* Scene 3 — group photo, golden hour */
+    .scene-group {
+      height: 500px;
+      background: linear-gradient(145deg, #d4874a 0%, #b06030 35%, #6b2e10 70%, #1c0e06 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scene-group::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 50%;
+      background: linear-gradient(to top, rgba(28,14,6,.55) 0%, transparent 100%);
+    }
+
+    /* Scene 4 — close-up, listening */
+    .scene-listen {
+      height: 580px;
+      background: linear-gradient(160deg, #3a1808 0%, #7a3820 30%, #c47840 65%, #e8b878 100%);
+      position: relative;
+    }
+
+    .scene-listen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 50% 60% at 35% 42%, rgba(240,170,80,.22) 0%, transparent 55%);
+    }
+
+    /* Scene 5 — speaker at front, auditorium warm */
+    .scene-speaker {
+      height: 75vh;
+      min-height: 460px;
+      background:
+        radial-gradient(ellipse 40% 55% at 52% 40%, rgba(200,130,60,.4) 0%, transparent 55%),
+        linear-gradient(180deg, #0e0806 0%, #3a1e0c 35%, #8a4820 65%, #c87840 100%);
+    }
+
+    /* Scene 6 — Maya portrait */
+    .scene-maya {
+      height: 100%;
+      min-height: 500px;
+      background: linear-gradient(145deg, #c48045 0%, #8b3d18 45%, #2e1810 100%);
+      position: relative;
+    }
+
+    .scene-maya::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 45% 55% at 40% 38%, rgba(230,165,80,.3) 0%, transparent 55%);
+    }
+
+    /* Scene 7 — Javier portrait */
+    .scene-javier {
+      height: 100%;
+      min-height: 500px;
+      background: linear-gradient(135deg, #1a3020 0%, #2e5030 40%, #7a6020 70%, #b89040 100%);
+    }
+
+    /* Scene 8 — Aisha portrait */
+    .scene-aisha {
+      height: 100%;
+      min-height: 500px;
+      background: linear-gradient(155deg, #3a1030 0%, #701840 35%, #a05820 65%, #d09050 100%);
+      position: relative;
+    }
+
+    .scene-aisha::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 40% 50% at 55% 40%, rgba(220,160,80,.25) 0%, transparent 55%);
+    }
+
+    /* Scene 9 — hands in center circle */
+    .scene-hands {
+      height: 65vh;
+      min-height: 400px;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 55%, rgba(210,140,60,.5) 0%, transparent 60%),
+        linear-gradient(170deg, #8b4520 0%, #5a2510 40%, #1c0e06 100%);
+    }
+
+    /* Scene 10 — mural painted on wall */
+    .scene-mural {
+      height: 55vh;
+      min-height: 360px;
+      background: linear-gradient(115deg,
+        #c4401a 0%, #e06030 18%,
+        #e09020 35%, #50a040 52%,
+        #2060c0 68%, #8030b0 84%,
+        #c04060 100%);
+      position: relative;
+    }
+
+    .scene-mural::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(28,14,6,.18);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 720px) {
+      .photo-pair  { grid-template-columns: 1fr; }
+      .photo-trio  { grid-template-columns: 1fr; }
+      .split-block { grid-template-columns: 1fr; }
+      .split-text  { padding: 3.5rem 1.8rem; }
+      .split-photo { min-height: 320px; }
+      nav { padding: 1.1rem 1.5rem; }
+      .hero-content { padding: 3rem 1.5rem 4rem; }
+      .caption-bar { padding: 1.2rem 1.5rem; gap: 1rem; }
+      .interlude   { padding: 4rem 1.5rem; }
+      .tf-content  { padding: 3.5rem 1.5rem; }
+      .ds-content  { padding: 3.5rem 1.5rem; }
+      .ds-impact   { gap: 1.8rem; }
+      footer       { padding: 2.5rem 1.5rem 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">IMU</a>
+    <div class="nav-right">
+      <a href="#story">Story</a>
+      <a href="#voices">Voices</a>
+      <a href="#give" class="nav-donate">Give</a>
+    </div>
+  </nav>
+
+  <!-- ── 1. HERO ── -->
+  <section class="hero">
+    <div class="hero-img"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Inspiring Multicultural Understanding &ensp;·&ensp; Est. 2014</p>
+      <h1 class="hero-headline">Every student<br>deserves to<br>be seen.</h1>
+      <p class="hero-sub">
+        A photo essay on belonging, identity, and what happens when
+        young people are finally given the space to speak.
+      </p>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      Scroll
+    </div>
+  </section>
+
+  <!-- ── 2. OPENING SCENE — circle ── -->
+  <div id="story">
+    <div class="photo-full">
+      <div class="img scene-circle"></div>
+      <div class="caption-bar">
+        <span class="cap-num">01</span>
+        <p class="cap-text">
+          <strong>Chicago, Illinois.</strong> Fifteen students pull their chairs into a circle.
+          No desks between them. No teacher at the front. For the next hour, this space belongs to them.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. INTERLUDE — mission ── -->
+  <div class="interlude">
+    <div class="interlude-inner">
+      <p class="interlude-label">Our Mission</p>
+      <blockquote class="interlude-quote">
+        "We don't hand students a curriculum.<br>
+        We ask them what they need —<br>
+        then we build it together."
+      </blockquote>
+      <p class="interlude-body">
+        Since 2014, IMU has partnered with 38 schools across the country to create
+        structured dialogue programs where students explore questions of culture, race,
+        and identity — not as abstract topics, but as the lived reality of the people
+        sitting next to them.
+      </p>
+    </div>
+  </div>
+
+  <!-- ── 4. PAIR — hallway + group ── -->
+  <div class="photo-pair">
+    <div class="pane">
+      <div class="img scene-hallway"></div>
+      <div class="caption-bar" style="background:#1a0e08;">
+        <span class="cap-num">02</span>
+        <p class="cap-text"><strong>Before the session.</strong> The conversation often starts in the hallway — before anyone calls it a dialogue.</p>
+      </div>
+    </div>
+    <div class="pane">
+      <div class="img scene-group"></div>
+      <div class="caption-bar" style="background:#1a0e08;">
+        <span class="cap-num">03</span>
+        <p class="cap-text"><strong>Los Angeles, California.</strong> A cohort of student facilitators after completing their first full training week.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. SPLIT — stats + tall scene ── -->
+  <div class="split-block" id="impact">
+    <div class="split-text">
+      <p class="st-label">Twelve Years of Work</p>
+      <h2>The numbers behind<br>the stories.</h2>
+      <p>
+        Every figure here is a student who sat in a circle, a school that said yes,
+        a facilitator who learned to hold space for someone else's truth.
+      </p>
+      <p>
+        94% of students who complete an IMU program report feeling more understood
+        by their peers. That number means something different every single time.
+      </p>
+      <div class="stats-row">
+        <div class="st-stat">
+          <div class="st-num">4,200+</div>
+          <div class="st-lbl">Students</div>
+        </div>
+        <div class="st-stat">
+          <div class="st-num">38</div>
+          <div class="st-lbl">Schools</div>
+        </div>
+        <div class="st-stat">
+          <div class="st-num">94%</div>
+          <div class="st-lbl">Feel Seen</div>
+        </div>
+      </div>
+    </div>
+    <div class="split-photo">
+      <div class="img scene-listen" style="height:100%;min-height:520px;"></div>
+    </div>
+  </div>
+
+  <!-- ── 6. FULL — speaker ── -->
+  <div class="photo-full">
+    <div class="img scene-speaker"></div>
+    <div class="caption-bar">
+      <span class="cap-num">04</span>
+      <p class="cap-text">
+        <strong>Atlanta, Georgia.</strong> Aisha, 18, addresses her school's first-ever
+        student-led dialogue forum — an event she organized, facilitated, and invited
+        her entire district to attend.
+      </p>
+    </div>
+  </div>
+
+  <!-- ── 7. VOICES — trio portraits ── -->
+  <div class="photo-trio" id="voices">
+    <div class="pane" style="position:relative;">
+      <div class="img scene-maya"></div>
+      <div class="over-caption">
+        <p class="name">Maya, 17</p>
+        <p class="role">Student Participant · Chicago, IL</p>
+      </div>
+    </div>
+    <div class="pane" style="position:relative;">
+      <div class="img scene-javier"></div>
+      <div class="over-caption">
+        <p class="name">Javier, 16</p>
+        <p class="role">Student Leader · Los Angeles, CA</p>
+      </div>
+    </div>
+    <div class="pane" style="position:relative;">
+      <div class="img scene-aisha"></div>
+      <div class="over-caption">
+        <p class="name">Aisha, 18</p>
+        <p class="role">Youth Facilitator · Atlanta, GA</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 8. TESTIMONY 1 — Maya ── -->
+  <div class="testimony-full">
+    <div class="tf-img" style="background:linear-gradient(135deg,#c48045 0%,#7a3018 55%,#1c0e06 100%);"></div>
+    <div class="tf-content">
+      <blockquote class="tf-quote">
+        "Before IMU, I never talked about being biracial at school.
+        In my first dialogue circle, a girl I barely knew started crying
+        because she felt the exact same way. We became best friends.
+        That's what IMU does — it makes you realize you're never as
+        alone as you think."
+      </blockquote>
+      <p class="tf-attr-name">Maya R.</p>
+      <p class="tf-attr-role">Age 17 · Student Participant · Chicago, Illinois</p>
+    </div>
+  </div>
+
+  <!-- ── 9. TESTIMONY 2 — Javier ── -->
+  <div class="testimony-full">
+    <div class="tf-img" style="background:linear-gradient(125deg,#1a3020 0%,#3a5030 35%,#907030 65%,#c09050 100%);"></div>
+    <div class="tf-content" style="margin-left:auto;margin-right:0;padding-right:2.5rem;">
+      <blockquote class="tf-quote">
+        "I grew up in a mostly white school and never saw my culture
+        reflected anywhere. IMU was the first time I heard my language
+        and traditions spoken about with real respect. I finally felt
+        like I belonged — not despite who I am, but because of it."
+      </blockquote>
+      <p class="tf-attr-name">Javier M.</p>
+      <p class="tf-attr-role">Age 16 · Student Leader · Los Angeles, California</p>
+    </div>
+  </div>
+
+  <!-- ── 10. HANDS SCENE ── -->
+  <div class="photo-full">
+    <div class="img scene-hands"></div>
+    <div class="caption-bar">
+      <span class="cap-num">05</span>
+      <p class="cap-text">
+        <strong>The closing ritual.</strong> Every IMU session ends the same way —
+        hands in the center, a moment of stillness. Students call it "locking in."
+        Facilitators call it the most important sixty seconds of the day.
+      </p>
+    </div>
+  </div>
+
+  <!-- ── 11. MURAL ── -->
+  <div class="photo-full">
+    <div class="img scene-mural"></div>
+    <div class="caption-bar">
+      <span class="cap-num">06</span>
+      <p class="cap-text">
+        <strong>Student-painted mural, Houston, Texas.</strong> At the end of each
+        residency, students create a shared piece of art. This one has been on the
+        wall for three years. Nobody has painted over it.
+      </p>
+    </div>
+  </div>
+
+  <!-- ── 12. TESTIMONY 3 — Aisha ── -->
+  <div class="testimony-full">
+    <div class="tf-img" style="background:linear-gradient(150deg,#3a0828 0%,#7a1838 40%,#b05820 70%,#d09050 100%);"></div>
+    <div class="tf-content">
+      <blockquote class="tf-quote">
+        "IMU trained me to lead conversations I once avoided entirely.
+        Now I run dialogue circles at my own school and watch students
+        open up in ways no textbook ever could. I didn't expect to find
+        my vocation at seventeen — but here I am."
+      </blockquote>
+      <p class="tf-attr-name">Aisha T.</p>
+      <p class="tf-attr-role">Age 18 · Youth Facilitator · Atlanta, Georgia</p>
+    </div>
+  </div>
+
+  <!-- ── 13. DONATE ── -->
+  <section class="donate-section" id="give">
+    <div class="ds-img"></div>
+    <div class="ds-overlay"></div>
+    <div class="ds-content">
+      <p class="ds-label">Support the Work</p>
+      <h2 class="ds-headline">Help us give every<br>student this space.</h2>
+      <p class="ds-body">
+        Your gift funds the dialogue programs, training, and school partnerships
+        that make this work real. No student should navigate belonging alone.
+      </p>
+
+      <div class="ds-impact">
+        <div class="ds-impact-item">
+          <div class="ds-impact-amt">$25</div>
+          <div class="ds-impact-desc">One student's semester of materials</div>
+        </div>
+        <div class="ds-impact-item">
+          <div class="ds-impact-amt">$100</div>
+          <div class="ds-impact-desc">A full dialogue circle for 15 students</div>
+        </div>
+        <div class="ds-impact-item">
+          <div class="ds-impact-amt">$250</div>
+          <div class="ds-impact-desc">One youth facilitator's full training</div>
+        </div>
+        <div class="ds-impact-item">
+          <div class="ds-impact-amt">$1,000</div>
+          <div class="ds-impact-desc">A new school partnership, one semester</div>
+        </div>
+      </div>
+
+      <div class="ds-btns">
+        <a href="#" class="btn-film btn-film-solid">Donate Now</a>
+        <a href="#" class="btn-film btn-film-ghost">Volunteer</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-row">
+      <span class="footer-logo">IMU — Inspiring Multicultural Understanding</span>
+      <div class="footer-links">
+        <a href="#">About</a>
+        <a href="#">Programs</a>
+        <a href="#">Schools</a>
+        <a href="#">Volunteer</a>
+        <a href="#">Press</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="footer-base">
+      <p class="footer-advocate">
+        Advocated by <strong>Elaine</strong>, IMU Advisory Board Member.
+      </p>
+      <p class="footer-copy">© 2026 IMU · 501(c)(3) Nonprofit · Est. 2014</p>
+    </div>
+  </footer>
+
+  <script>
+    // Swap nav style on scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 80);
+    }, { passive: true });
+  </script>
+
+</body>
+</html>
