@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Student Record — IMU</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:  #0e0c0a;
+      --ink:    #1a1714;
+      --mid:    #4a4540;
+      --muted:  #7a7570;
+      --rule:   #c8c0b4;
+      --rule-lt:#e0d8cc;
+      --paper:  #f8f5ef;
+      --white:  #ffffff;
+      --red:    #c01818;
+      --red-lt: #e02020;
+    }
+
+    html { -webkit-font-smoothing: antialiased; }
+
+    body {
+      background: #ddd8d0;
+      color: var(--ink);
+      font-family: 'Libre Baskerville', Georgia, serif;
+      line-height: 1.5;
+    }
+
+    /* ── PAGE WRAPPER — newspaper sheet ── */
+    .page {
+      background: var(--paper);
+      max-width: 1140px;
+      margin: 1.8rem auto;
+      box-shadow: 0 4px 40px rgba(0,0,0,.22), 0 1px 6px rgba(0,0,0,.12);
+    }
+
+    /* ── UTILITY ── */
+    hr.rule       { border: none; border-top: 1px solid var(--rule); margin: 0; }
+    hr.rule-heavy { border: none; border-top: 3px solid var(--black); margin: 0; }
+    hr.rule-dbl   {
+      border: none;
+      border-top: 5px double var(--black);
+      margin: 0;
+    }
+    hr.rule-red   { border: none; border-top: 2px solid var(--red); margin: 0; }
+
+    .col-rule {
+      width: 1px;
+      background: var(--rule);
+      align-self: stretch;
+      flex-shrink: 0;
+    }
+
+    /* ── KICKER ── */
+    .kicker {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: .3rem;
+      display: block;
+    }
+
+    /* ── BYLINE ── */
+    .byline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .7rem;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: .4rem 0 .7rem;
+      display: block;
+    }
+
+    .byline strong { color: var(--ink); }
+
+    /* ── DATELINE ── */
+    .dateline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    /* ── BODY COPY ── */
+    .copy {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: .82rem;
+      line-height: 1.58;
+      color: var(--ink);
+      text-align: justify;
+      hyphens: auto;
+    }
+
+    .copy p { margin-bottom: .55em; }
+
+    .copy p.drop::first-letter {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 3.8em;
+      font-weight: 900;
+      float: left;
+      line-height: .78;
+      margin-right: .08em;
+      margin-top: .05em;
+      color: var(--black);
+    }
+
+    /* ══════════════════════════════════
+       SECTION 1 — ABOVE MASTHEAD BAR
+    ══════════════════════════════════ */
+    .above-masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .45rem 1.5rem;
+      border-bottom: 1px solid var(--rule);
+      flex-wrap: wrap;
+      gap: .4rem;
+    }
+
+    .am-left, .am-right {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .62rem;
+      font-weight: 400;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .am-center {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .6rem;
+      font-weight: 400;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ══════════════════════════════════
+       SECTION 2 — MASTHEAD
+    ══════════════════════════════════ */
+    .masthead {
+      padding: .9rem 1.5rem .7rem;
+      text-align: center;
+      border-bottom: 5px double var(--black);
+    }
+
+    .mast-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.8rem, 7vw, 5.8rem);
+      font-weight: 900;
+      letter-spacing: .04em;
+      color: var(--black);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .mast-subtitle {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .72rem;
+      font-weight: 400;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-top: .3rem;
+    }
+
+    .masthead-meta {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      margin-top: .6rem;
+      padding-top: .5rem;
+      border-top: 1px solid var(--rule);
+    }
+
+    .mm-left {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .6rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+    }
+
+    .mm-price {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: .82rem;
+      font-style: italic;
+      color: var(--mid);
+    }
+
+    .mm-right {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .6rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    /* ══════════════════════════════════
+       SECTION 3 — BREAKING BANNER
+    ══════════════════════════════════ */
+    .breaking-banner {
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: .4rem 1.2rem;
+      overflow: hidden;
+    }
+
+    .breaking-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--black);
+      padding: .18rem .65rem;
+      flex-shrink: 0;
+    }
+
+    .breaking-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ══════════════════════════════════
+       SECTION 4 — NAV BAR
+    ══════════════════════════════════ */
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      border-bottom: 3px solid var(--black);
+      border-top: 1px solid var(--rule);
+    }
+
+    .nav-item {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      padding: .38rem 1.1rem;
+      border-right: 1px solid var(--rule);
+      transition: background .15s;
+    }
+
+    .nav-item:first-child { border-left: 1px solid var(--rule); }
+    .nav-item:hover { background: var(--ink); color: var(--paper); }
+    .nav-item.active { background: var(--red); color: #fff; }
+
+    /* ══════════════════════════════════
+       BROADSHEET BODY
+    ══════════════════════════════════ */
+    .broadsheet { padding: 0 1.2rem; }
+
+    /* ── 6-column grid ── */
+    .cols-6 {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      column-gap: 0;
+    }
+
+    /* spans */
+    .span-1 { grid-column: span 1; }
+    .span-2 { grid-column: span 2; }
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-5 { grid-column: span 5; }
+    .span-6 { grid-column: span 6; }
+
+    /* story cell — adds internal padding + right border */
+    .story {
+      padding: .9rem .9rem .8rem;
+      border-right: 1px solid var(--rule);
+      min-width: 0;
+    }
+
+    .story:last-child,
+    .story.no-border { border-right: none; }
+
+    /* story headline sizes */
+    .hed-xl {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.8rem);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -.01em;
+      color: var(--black);
+      margin-bottom: .35rem;
+    }
+
+    .hed-lg {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.2rem, 2.5vw, 1.9rem);
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--black);
+      margin-bottom: .3rem;
+    }
+
+    .hed-md {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--black);
+      margin-bottom: .28rem;
+    }
+
+    .hed-sm {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(.9rem, 1.5vw, 1.1rem);
+      font-weight: 700;
+      font-style: italic;
+      line-height: 1.2;
+      color: var(--black);
+      margin-bottom: .25rem;
+    }
+
+    /* deck */
+    .deck {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .82rem;
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--mid);
+      margin-bottom: .5rem;
+    }
+
+    /* continued line */
+    .continued {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .65rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-style: italic;
+      text-align: right;
+      margin-top: .4rem;
+    }
+
+    /* ── IMAGE PLACEHOLDER (halftone feel) ── */
+    .photo {
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      background: #2a2520;
+    }
+
+    .photo-halftone {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(0,0,0,.55) 1px, transparent 1px);
+      background-size: 5px 5px;
+      mix-blend-mode: multiply;
+    }
+
+    .photo-inner {
+      width: 100%;
+      display: block;
+    }
+
+    .photo-caption {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .62rem;
+      font-weight: 400;
+      letter-spacing: .04em;
+      color: var(--mid);
+      padding: .35rem 0 0;
+      border-top: 1px solid var(--rule);
+      line-height: 1.45;
+    }
+
+    .photo-caption em { font-style: italic; color: var(--muted); }
+
+    /* ── PULL QUOTE (boxed) ── */
+    .pull-box {
+      border-top: 3px solid var(--black);
+      border-bottom: 3px solid var(--black);
+      padding: .7rem .5rem;
+      margin: .8rem 0;
+      text-align: center;
+    }
+
+    .pull-box blockquote {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(.9rem, 1.6vw, 1.15rem);
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1.45;
+      color: var(--black);
+    }
+
+    .pull-box cite {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .62rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-top: .4rem;
+      font-style: normal;
+    }
+
+    /* ── BOXED STORY ── */
+    .boxed {
+      border: 2px solid var(--black);
+      padding: .7rem .8rem;
+      margin-top: .3rem;
+    }
+
+    .boxed-head {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(.85rem, 1.4vw, 1.05rem);
+      font-weight: 700;
+      color: var(--black);
+      margin-bottom: .4rem;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: .3rem;
+    }
+
+    /* ── DATA STRIP (numbers as newspaper infographic) ── */
+    .data-strip {
+      background: var(--black);
+      color: var(--paper);
+      padding: .8rem 1.2rem;
+      margin-bottom: .3rem;
+    }
+
+    .ds-head {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--red-lt);
+      margin-bottom: .6rem;
+      border-bottom: 1px solid rgba(255,255,255,.15);
+      padding-bottom: .35rem;
+    }
+
+    .ds-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .6rem 1rem;
+    }
+
+    .ds-item {}
+
+    .ds-num {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-weight: 900;
+      color: var(--paper);
+      line-height: 1;
+      letter-spacing: -.02em;
+    }
+
+    .ds-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .58rem;
+      font-weight: 400;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(248,245,239,.45);
+      margin-top: .15rem;
+    }
+
+    /* ── SECTION DIVIDERS ── */
+    .section-label-bar {
+      background: var(--black);
+      color: var(--paper);
+      padding: .28rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .slb-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    .slb-rule {
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,.2);
+    }
+
+    /* ── HORIZONTAL STORY DIVIDER ── */
+    .hdiv {
+      border-top: 1px solid var(--rule);
+      margin: 0 .9rem;
+    }
+
+    /* ══════════════════════════════════
+       FULL-WIDTH PULL QUOTE BAND
+    ══════════════════════════════════ */
+    .wide-pull {
+      padding: 1.4rem 3rem;
+      border-top: 3px solid var(--black);
+      border-bottom: 3px solid var(--black);
+      text-align: center;
+      margin: 0 1.2rem;
+    }
+
+    .wide-pull blockquote {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--black);
+      line-height: 1.35;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .wide-pull cite {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .65rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-top: .6rem;
+      font-style: normal;
+    }
+
+    /* ══════════════════════════════════
+       CLASSIFIEDS / DONATE
+    ══════════════════════════════════ */
+    .classifieds-section {
+      padding: 0 1.2rem 1.2rem;
+    }
+
+    .classified-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      column-gap: 0;
+      border: 2px solid var(--black);
+    }
+
+    @media (max-width: 700px) {
+      .classified-grid { grid-template-columns: 1fr; }
+    }
+
+    .classified-col {
+      padding: .8rem .9rem;
+      border-right: 1px solid var(--rule);
+    }
+
+    .classified-col:last-child { border-right: none; }
+
+    .classified-col-head {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .62rem;
+      font-weight: 800;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--mid);
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: .3rem;
+      margin-bottom: .6rem;
+    }
+
+    /* individual classified ad */
+    .classified-ad {
+      margin-bottom: .85rem;
+      padding-bottom: .75rem;
+      border-bottom: 1px dotted var(--rule);
+    }
+
+    .classified-ad:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+    .ca-head {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-bottom: .25rem;
+    }
+
+    .ca-body {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: .72rem;
+      line-height: 1.55;
+      color: var(--ink);
+    }
+
+    .ca-ref {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .62rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-top: .2rem;
+      display: block;
+    }
+
+    /* DONATE AD — highlighted */
+    .ca-featured {
+      background: var(--black);
+      color: var(--paper);
+      padding: .7rem .8rem;
+      margin-bottom: .85rem;
+    }
+
+    .ca-featured .ca-head { color: var(--red-lt); }
+    .ca-featured .ca-body { color: rgba(248,245,239,.8); }
+    .ca-featured .ca-ref  { color: var(--red-lt); }
+
+    .ca-tiers {
+      margin: .35rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: .12rem;
+    }
+
+    .ca-tier {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .66rem;
+      font-weight: 400;
+      letter-spacing: .04em;
+      color: rgba(248,245,239,.7);
+    }
+
+    .ca-tier strong {
+      color: var(--paper);
+      font-weight: 700;
+    }
+
+    .ca-btn {
+      display: inline-block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .65rem;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--paper);
+      padding: .28rem .85rem;
+      text-decoration: none;
+      margin-top: .4rem;
+      transition: background .15s;
+    }
+
+    .ca-btn:hover { background: #ffe88a; }
+
+    /* box number style */
+    .box-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .58rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: right;
+      margin-top: .25rem;
+    }
+
+    /* ══════════════════════════════════
+       FOOTER
+    ══════════════════════════════════ */
+    .paper-footer {
+      border-top: 5px double var(--black);
+      padding: .7rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    .pf-left {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: .78rem;
+      font-style: italic;
+      color: var(--mid);
+    }
+
+    .pf-center {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .62rem;
+      font-weight: 400;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .pf-right {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .62rem;
+      font-weight: 400;
+      letter-spacing: .1em;
+      color: var(--muted);
+    }
+
+    /* ══════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════ */
+    @media (max-width: 860px) {
+      .cols-6 { grid-template-columns: repeat(3, 1fr); }
+      .span-4 { grid-column: span 3; }
+      .span-3 { grid-column: span 3; }
+      .span-2 { grid-column: span 3; }
+      .span-1 { grid-column: span 3; }
+      .span-6 { grid-column: span 3; }
+      .span-5 { grid-column: span 3; }
+      .hide-sm { display: none; }
+    }
+
+    @media (max-width: 560px) {
+      .page { margin: 0; box-shadow: none; }
+      .cols-6 { grid-template-columns: 1fr; }
+      .span-1, .span-2, .span-3,
+      .span-4, .span-5, .span-6 { grid-column: span 1; }
+      .story { border-right: none; border-bottom: 1px solid var(--rule); }
+      .wide-pull { padding: 1.2rem 1.5rem; }
+      .masthead-meta { grid-template-columns: 1fr 1fr; }
+      .mm-price { display: none; }
+      nav.nav-bar { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ ABOVE MASTHEAD ══ -->
+  <div class="above-masthead">
+    <span class="am-left">Vol. XII &nbsp;·&nbsp; No. 89</span>
+    <span class="am-center">Inspiring Multicultural Understanding &nbsp;·&nbsp; imu.org</span>
+    <span class="am-right">Est. 2014 &nbsp;·&nbsp; 501(c)(3) Nonprofit</span>
+  </div>
+
+  <!-- ══ MASTHEAD ══ -->
+  <div class="masthead">
+    <div class="mast-name">The Student Record</div>
+    <div class="mast-subtitle">Independent Reporting on Youth, Culture &amp; Belonging in America's Schools</div>
+    <div class="masthead-meta">
+      <span class="mm-left">Monday, March 30, 2026 &nbsp;·&nbsp; Chicago Edition</span>
+      <span class="mm-price">One conversation at a time.</span>
+      <span class="mm-right">Free to all students &nbsp;·&nbsp; Donate inside</span>
+    </div>
+  </div>
+
+  <!-- ══ BREAKING BANNER ══ -->
+  <div class="breaking-banner">
+    <span class="breaking-tag">Breaking</span>
+    <span class="breaking-text">NEW DATA: 94% OF STUDENTS IN IMU PROGRAMS REPORT FEELING MORE UNDERSTOOD BY PEERS &nbsp;·&nbsp; 4,200 STUDENTS REACHED ACROSS 38 SCHOOLS &nbsp;·&nbsp; YOUTH FACILITATOR PROGRAM EXPANDS TO FIFTH CITY</span>
+  </div>
+
+  <!-- ══ NAV BAR ══ -->
+  <nav class="nav-bar">
+    <a class="nav-item active" href="#">Front Page</a>
+    <a class="nav-item" href="#mission">Our Mission</a>
+    <a class="nav-item" href="#voices">Student Voices</a>
+    <a class="nav-item" href="#impact">Impact</a>
+    <a class="nav-item" href="#donate">Community Notices</a>
+  </nav>
+
+  <!-- ══════════════════════════════════
+       ROW 1 — ABOVE THE FOLD
+  ══════════════════════════════════ -->
+  <div class="broadsheet">
+    <div class="cols-6" style="border-bottom:1px solid var(--rule);">
+
+      <!-- MAIN LEAD — 4 cols -->
+      <div class="story span-4" id="mission">
+        <span class="kicker">Youth Empowerment · Exclusive Report</span>
+        <h1 class="hed-xl">
+          Thousands of Students<br>
+          Discover Belonging in<br>
+          America's Classrooms
+        </h1>
+        <p class="deck">
+          A nonprofit's twelve-year effort to give young people the space
+          to speak honestly about race and culture is producing results
+          that cannot be ignored — and a 94% satisfaction rate that
+          rivals any program in the country.
+        </p>
+        <span class="byline">
+          By <strong>IMU Community Desk</strong> &nbsp;·&nbsp;
+          Reported from Chicago, Los Angeles and Atlanta &nbsp;·&nbsp;
+          Monday, March 30, 2026
+        </span>
+        <hr class="rule" style="margin-bottom:.7rem;" />
+
+        <!-- 3-col text flow inside the lead story -->
+        <div style="columns:3 120px; column-gap:1.1rem; column-rule:1px solid var(--rule-lt);">
+          <div class="copy">
+            <p class="drop">In a gymnasium in Chicago on a Thursday afternoon, fifteen students arrange their chairs into a circle. There are no desks between them. No teacher at the front of the room. For the next hour, this space is theirs.</p>
+            <p>This is an Inspiring Multicultural Understanding dialogue circle, and it has been happening — in variations, in schools from Los Angeles to Atlanta — for twelve years. What began as a single weekly session at one Chicago middle school in 2014 has grown into a nationwide program serving more than 4,200 students across 38 partner schools in 12 cities.</p>
+            <p>The organization's core premise is disarmingly simple: that young people need safe, structured spaces to talk honestly about culture, race, and identity. Not as abstract topics, but as the lived realities of the people sitting beside them.</p>
+            <p>"Most schools treat these conversations like dangerous territory," says the IMU program director. "We treat them like necessary territory. Like the most important conversation a school could possibly make room for."</p>
+            <p>The data appears to support that conviction. In post-program surveys conducted across all 38 partner schools, 94 percent of students reported feeling more understood by their peers after completing an IMU program. Eighty-eight percent said they were more comfortable discussing their own cultural identity. Seventy-nine percent reported a greater sense of belonging at school overall.</p>
+            <p>Perhaps most striking: 97 percent said they would recommend the program to a friend.</p>
+          </div>
+        </div>
+
+        <div class="pull-box" style="margin-top:.8rem;">
+          <blockquote>"We don't hand students a curriculum. We ask them what they need — and then we build it together."</blockquote>
+          <cite>— IMU Program Director, Chicago</cite>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN — photo + side story — 2 cols -->
+      <div class="story span-2 no-border" style="display:flex;flex-direction:column;gap:.7rem;">
+
+        <!-- Photo placeholder -->
+        <div>
+          <div class="photo" style="height:190px;">
+            <div class="photo-inner" style="height:190px;background:linear-gradient(160deg,#6a3818 0%,#a06030 40%,#c89050 70%,#e0b870 100%);"></div>
+            <div class="photo-halftone"></div>
+          </div>
+          <p class="photo-caption">Students gather for a dialogue circle at Lincoln Middle School, Chicago. <em>Photo: IMU Archive, 2025.</em></p>
+        </div>
+
+        <!-- Side story: The Numbers -->
+        <div class="data-strip" id="impact">
+          <div class="ds-head">Twelve Years · By the Numbers</div>
+          <div class="ds-grid">
+            <div class="ds-item">
+              <div class="ds-num">4,200+</div>
+              <div class="ds-label">Students Reached</div>
+            </div>
+            <div class="ds-item">
+              <div class="ds-num">38</div>
+              <div class="ds-label">Partner Schools</div>
+            </div>
+            <div class="ds-item">
+              <div class="ds-num">12</div>
+              <div class="ds-label">Years Active</div>
+            </div>
+            <div class="ds-item">
+              <div class="ds-num">94%</div>
+              <div class="ds-label">Feel Understood</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Boxed short story -->
+        <div class="boxed">
+          <div class="boxed-head">How It Works</div>
+          <div class="copy">
+            <p>Each IMU program pairs students with a trained facilitator — often a peer from the same school — for a series of structured dialogue sessions. Topics emerge from students themselves: identity, belonging, cultural heritage, the experience of being misunderstood.</p>
+            <p>No topic is ruled out. No student is silenced. The only rule: speak for yourself.</p>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /row 1 -->
+
+    <!-- ══════════════════════════════════
+         ROW 2 — SECTION DIVIDER
+    ══════════════════════════════════ -->
+    <div class="section-label-bar">
+      <span class="slb-text">Student Voices</span>
+      <div class="slb-rule"></div>
+      <span class="slb-text">Firsthand Accounts from IMU Participants</span>
+    </div>
+
+    <!-- ══════════════════════════════════
+         ROW 2 — STUDENT STORIES
+    ══════════════════════════════════ -->
+    <div class="cols-6" id="voices" style="border-bottom:1px solid var(--rule);">
+
+      <!-- Story 1: Maya — 2 cols -->
+      <div class="story span-2">
+        <span class="kicker">Personal Account</span>
+        <h2 class="hed-lg">'I Realized I Was Never as Alone as I Thought'</h2>
+        <span class="byline">By <strong>Maya R.</strong>, 17 &nbsp;·&nbsp; IMU Participant</span>
+        <hr class="rule" style="margin-bottom:.6rem;" />
+        <div class="copy">
+          <p class="drop">Before IMU, I never talked about being biracial at school. I thought no one would understand. I had learned, without anyone saying it directly, that certain parts of who I was were safer left unmentioned.</p>
+          <p>In my first dialogue circle, a girl I barely knew started crying because she felt the exact same way. We became best friends. That is what IMU does — it makes you realize you are never as alone as you think. It sounds small when you say it. It is not small when you feel it.</p>
+        </div>
+        <div class="pull-box">
+          <blockquote>"It makes you realize you are never as alone as you think."</blockquote>
+          <cite>— Maya R., 17 · Chicago, Illinois</cite>
+        </div>
+      </div>
+
+      <!-- Story 2: Javier — 2 cols -->
+      <div class="story span-2">
+        <span class="kicker">Student Report</span>
+        <h2 class="hed-lg">'My Culture Finally Had a Place Here'</h2>
+        <span class="byline">By <strong>Javier M.</strong>, 16 &nbsp;·&nbsp; IMU Student Leader</span>
+        <hr class="rule" style="margin-bottom:.6rem;" />
+        <div class="copy">
+          <p class="drop">I grew up in a mostly white school and never saw my culture reflected anywhere. Not in the books. Not in the curriculum. Not in the conversations teachers chose to have or to avoid.</p>
+          <p>IMU was the first time I heard my language and my traditions spoken about with real respect. Not as a curiosity. Not as something to be explained to other people. Just as part of the fabric of the room. I finally felt like I belonged — not despite who I am, but because of it. That difference is everything.</p>
+        </div>
+        <div class="box-num">Continued from A1</div>
+      </div>
+
+      <!-- Story 3: Aisha — 2 cols -->
+      <div class="story span-2 no-border">
+        <span class="kicker">Profile</span>
+        <h2 class="hed-lg">From Fear to Facilitator: The Story of Aisha T.</h2>
+        <span class="byline">By <strong>The Student Record</strong> &nbsp;·&nbsp; Atlanta Bureau</span>
+        <hr class="rule" style="margin-bottom:.6rem;" />
+        <div class="copy">
+          <p class="drop">Two years ago, Aisha T. was afraid to bring up race in class. Now, at 18, she runs dialogue circles at her own school in Atlanta — sessions she designed, facilitated, and invited her entire district to attend.</p>
+          <p>"IMU trained me to lead conversations I once avoided entirely," she says. "I watch students open up in ways no textbook ever could." This past spring, Aisha organized her school's first student-led dialogue forum. The district superintendent attended. Three principals called the following week. This is what the Youth Facilitator Program was always meant to become.</p>
+          <p>"This program didn't just change my school," Aisha says. "It changed who I am."</p>
+        </div>
+      </div>
+    </div><!-- /row 2 -->
+
+    <!-- ══════════════════════════════════
+         ROW 3 — WIDE PULL QUOTE
+    ══════════════════════════════════ -->
+    <div class="wide-pull">
+      <blockquote>
+        "A student who feels unseen cannot learn. Cannot lead. Cannot become
+        who they were meant to be. That is why we exist — and why, after
+        twelve years, we are not done."
+      </blockquote>
+      <cite>— Inspiring Multicultural Understanding · Mission Statement</cite>
+    </div>
+
+    <!-- ══════════════════════════════════
+         ROW 4 — SECTION DIVIDER
+    ══════════════════════════════════ -->
+    <div class="section-label-bar" style="margin-top:0;">
+      <span class="slb-text">How We Work</span>
+      <div class="slb-rule"></div>
+      <span class="slb-text">The Four Pillars of the IMU Program</span>
+    </div>
+
+    <!-- ══════════════════════════════════
+         ROW 4 — FOUR PILLARS
+    ══════════════════════════════════ -->
+    <div class="cols-6" style="border-bottom:3px solid var(--black);">
+      <div class="story span-2" style="border-top:3px solid var(--red); padding-top:.7rem;">
+        <span class="kicker">Pillar I</span>
+        <h3 class="hed-md">Open Dialogue</h3>
+        <div class="copy">
+          <p>Safe, facilitated spaces for honest conversation about race, culture, and identity — structured to build trust before depth. Every session begins with a shared agreement: to speak from personal experience, to listen without judgment, and to hold what is said in confidence.</p>
+        </div>
+      </div>
+      <div class="story span-2" style="border-top:3px solid var(--red); padding-top:.7rem;">
+        <span class="kicker">Pillar II</span>
+        <h3 class="hed-md">Student Voice</h3>
+        <div class="copy">
+          <p>Programs are co-designed with the young people who participate in them. Students are not the audience for IMU's curriculum — they are its authors. Their lived experiences, questions, and concerns shape every session from the ground up. The facilitator guides. The students lead.</p>
+        </div>
+      </div>
+      <div class="story span-2 no-border" style="display:flex;flex-direction:column;gap:.7rem;">
+        <div style="border-top:3px solid var(--red); padding-top:.7rem;">
+          <span class="kicker">Pillar III</span>
+          <h3 class="hed-md">Educator Partnership</h3>
+          <div class="copy">
+            <p>IMU works directly with teachers and administrators to embed inclusion into the daily fabric of school life — not as a module that comes and goes, but as a permanent feature of how a school functions.</p>
+          </div>
+        </div>
+        <hr class="rule" />
+        <div>
+          <span class="kicker">Pillar IV</span>
+          <h3 class="hed-md">Youth Leadership</h3>
+          <div class="copy">
+            <p>Students trained as facilitators carry the work forward long after IMU departs. More than 420 young people have completed facilitator training since 2014 — each one a multiplier, running circles in their own schools and communities.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /broadsheet -->
+
+  <!-- ══════════════════════════════════
+       CLASSIFIEDS — DONATE CTA
+  ══════════════════════════════════ -->
+  <div class="section-label-bar" style="margin: 0 0 0 0;">
+    <span class="slb-text">Community Notices &amp; Classified Advertisements</span>
+    <div class="slb-rule"></div>
+    <span class="slb-text">Page C-1</span>
+  </div>
+
+  <div class="classifieds-section" id="donate">
+    <div class="classified-grid">
+
+      <!-- Col 1: Main donate ad (featured) -->
+      <div class="classified-col">
+        <div class="classified-col-head">Appeals &amp; Donations</div>
+
+        <div class="ca-featured">
+          <div class="ca-head">🔲 Youth Nonprofit — Seeks Community Support</div>
+          <div class="ca-body">
+            Inspiring Multicultural Understanding (est. 2014) currently
+            serves 4,200+ students across 38 schools. To expand programming
+            to schools on our waiting list, we are seeking donations at
+            any level. All gifts are tax-deductible. No student turned away
+            for inability to pay.
+          </div>
+          <div class="ca-tiers">
+            <div class="ca-tier"><strong>$25</strong> — Funds one student's semester of materials</div>
+            <div class="ca-tier"><strong>$100</strong> — Funds one complete dialogue circle (15 students)</div>
+            <div class="ca-tier"><strong>$250</strong> — Sponsors one youth facilitator through full training</div>
+            <div class="ca-tier"><strong>$1,000</strong> — Launches a new school partnership for a semester</div>
+          </div>
+          <a href="#" class="ca-btn">Donate Now — imu.org</a>
+          <div class="box-num" style="color:rgba(248,245,239,.3);margin-top:.3rem;">Box No. IMU-001</div>
+        </div>
+
+        <div class="classified-ad">
+          <div class="ca-head">Volunteer Facilitators Sought</div>
+          <div class="ca-body">IMU seeks trained youth facilitators for the 2026–27 school year. No prior experience required — full training provided. Must be 16 or older and enrolled in a partner school or community program.</div>
+          <span class="ca-ref">Reply: imu.org/volunteer &nbsp;·&nbsp; Box No. IMU-007</span>
+        </div>
+      </div>
+
+      <!-- Col 2: School partnerships + events -->
+      <div class="classified-col">
+        <div class="classified-col-head">School Partnerships</div>
+
+        <div class="classified-ad">
+          <div class="ca-head">School Partnership Applications Open</div>
+          <div class="ca-body">IMU is now accepting applications from K–12 schools for the 2026–27 program year. Priority given to under-resourced schools with demonstrated need. No cost to participating schools. Application deadline: May 31, 2026.</div>
+          <span class="ca-ref">Contact: imu.org/schools &nbsp;·&nbsp; Box No. IMU-012</span>
+        </div>
+
+        <div class="classified-ad">
+          <div class="ca-head">International Day of Peace — Sept. 21</div>
+          <div class="ca-body">IMU invites all partner schools and community members to the annual International Day of Peace celebration. Performances, student-led dialogues, and community dinner. All are welcome. Free admission.</div>
+          <span class="ca-ref">RSVP: imu.org/peace-day &nbsp;·&nbsp; Box No. IMU-022</span>
+        </div>
+
+        <div class="classified-ad">
+          <div class="ca-head">Summer Retreat — Limited Spaces</div>
+          <div class="ca-body">Annual IMU camping retreat for youth facilitators and program alumni. July 14–16, 2026. Transportation provided from Chicago, Los Angeles, and Atlanta. Partial and full scholarships available.</div>
+          <span class="ca-ref">Apply: imu.org/retreat &nbsp;·&nbsp; Box No. IMU-031</span>
+        </div>
+      </div>
+
+      <!-- Col 3: Notices + Elaine credit -->
+      <div class="classified-col">
+        <div class="classified-col-head">Notices &amp; Acknowledgments</div>
+
+        <div class="classified-ad">
+          <div class="ca-head">Corporate Giving — Matching Available</div>
+          <div class="ca-body">Several corporate partners are currently offering donation matches for gifts made to IMU before June 30, 2026. Check with your employer's giving program. Matched gifts have doubled the impact of more than 140 donors this year.</div>
+          <span class="ca-ref">Details: imu.org/matching &nbsp;·&nbsp; Box No. IMU-044</span>
+        </div>
+
+        <div class="classified-ad">
+          <div class="ca-head">Educator Professional Development</div>
+          <div class="ca-body">IMU now offers professional development workshops for teachers on facilitating identity and culture conversations in the classroom. Half-day and full-day formats. CEU credits available in select states.</div>
+          <span class="ca-ref">Inquire: imu.org/educators &nbsp;·&nbsp; Box No. IMU-055</span>
+        </div>
+
+        <!-- Elaine's credit — styled as a formal notice -->
+        <div class="classified-ad" style="border:1px solid var(--rule);padding:.55rem .6rem;">
+          <div class="ca-head" style="color:var(--red);">Advisory Board Acknowledgment</div>
+          <div class="ca-body">
+            This publication and the work described herein has been advocated
+            and supported by <strong>Elaine</strong>, IMU Advisory Board Member,
+            whose commitment to youth empowerment and multicultural dialogue
+            has guided this organization since its earliest years.
+          </div>
+          <span class="ca-ref">— The IMU Board of Directors</span>
+        </div>
+
+      </div>
+    </div><!-- /classified-grid -->
+  </div><!-- /classifieds-section -->
+
+  <!-- ══ FOOTER ══ -->
+  <div class="paper-footer">
+    <span class="pf-left">The Student Record &nbsp;·&nbsp; Inspiring Multicultural Understanding</span>
+    <span class="pf-center">Every Voice · Every Story · Every School</span>
+    <span class="pf-right">© 2026 IMU &nbsp;·&nbsp; 501(c)(3) &nbsp;·&nbsp; imu.org</span>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
