@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMU — Inspiring Multicultural Understanding</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Open+Sans:wght@300;400;500;600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:    #2ea3f2;
+      --blue-dk: #389cd8;
+      --blue-lt: #e8f4fd;
+      --orange:  #ed8532;
+      --orange-lt:#fef3e8;
+      --text:    #333;
+      --mid:     #555;
+      --muted:   #888;
+      --quiet:   #bbb;
+      --rule:    #e8e8e8;
+      --white:   #fff;
+      --measure: 640px;
+    }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { background: var(--white); color: var(--text); font-family: 'Open Sans', Arial, sans-serif; line-height: 1.8; }
+
+    /* NAV */
+    nav {
+      padding: 1.5rem 3rem;
+      display: flex; align-items: baseline; justify-content: space-between;
+      border-bottom: 1px solid var(--rule);
+      position: sticky; top: 0; z-index: 100; background: var(--white);
+    }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--blue-dk); letter-spacing: .02em; }
+    .nav-sub { font-size: .7rem; color: var(--muted); letter-spacing: .08em; margin-top: .05rem; }
+    .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+    .nav-links a { font-size: .8rem; color: var(--muted); text-decoration: none; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-donate { color: var(--orange) !important; font-weight: 600 !important; }
+
+    /* CONTENT COLUMN */
+    .col { max-width: var(--measure); margin: 0 auto; padding: 0 2rem; }
+
+    /* HERO */
+    .hero { padding: 7rem 2rem 5rem; max-width: var(--measure); margin: 0 auto; }
+    .hero-kicker { font-size: .72rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--blue); margin-bottom: 1.5rem; }
+    .hero-h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.4rem, 5vw, 3.8rem); font-weight: 400; line-height: 1.2; color: var(--text); margin-bottom: 1.6rem; }
+    .hero-h1 em { font-style: italic; }
+    .hero-rule { width: 40px; height: 2px; background: var(--orange); margin-bottom: 1.6rem; }
+    .hero-body { font-size: 1rem; color: var(--mid); line-height: 1.9; margin-bottom: 2.5rem; max-width: 480px; font-weight: 300; }
+    .hero-actions { display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; }
+    .btn-primary { background: var(--orange); color: var(--white); padding: .7rem 1.8rem; font-size: .88rem; font-weight: 600; text-decoration: none; border-radius: 2px; transition: background .2s; }
+    .btn-primary:hover { background: #c96a1a; }
+    .btn-text { font-size: .88rem; color: var(--blue-dk); font-weight: 500; text-decoration: none; border-bottom: 1px solid var(--blue-lt); transition: border-color .2s; }
+    .btn-text:hover { border-color: var(--blue); }
+
+    /* NUMBERS */
+    hr.rule { border: 0; border-top: 1px solid var(--rule); margin: 0; }
+    .nums { display: grid; grid-template-columns: repeat(4,1fr); border-bottom: 1px solid var(--rule); }
+    .num-cell { padding: 2.5rem 2rem; border-right: 1px solid var(--rule); }
+    .num-cell:last-child { border-right: 0; }
+    .num-val { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--blue-dk); line-height: 1; }
+    .num-lbl { font-size: .7rem; color: var(--muted); margin-top: .4rem; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
+
+    /* SECTIONS */
+    .section { padding: 5rem 0; border-bottom: 1px solid var(--rule); }
+    .section:last-child { border-bottom: 0; }
+    .kicker { font-size: .7rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--blue); margin-bottom: .8rem; }
+    .sec-h { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 400; line-height: 1.3; color: var(--text); margin-bottom: 2rem; }
+    .sec-h em { font-style: italic; }
+    .body-text p { color: var(--mid); font-size: .95rem; line-height: 1.9; margin-bottom: 1rem; font-weight: 300; }
+
+    /* TIMELINE */
+    .tl { position: relative; padding-left: 2rem; }
+    .tl::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 1px; background: linear-gradient(to bottom, var(--blue) 0%, var(--orange) 100%); }
+    .tl-item { margin-bottom: 3rem; position: relative; }
+    .tl-item::before { content: ''; position: absolute; left: -2rem; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--white); border: 2px solid var(--blue); transform: translateX(-4px); }
+    .tl-item.accent::before { border-color: var(--orange); }
+    .tl-item.now::before { background: var(--blue); border-color: var(--blue); width: 11px; height: 11px; box-shadow: 0 0 0 3px rgba(46,163,242,.2); }
+    .tl-year { font-size: .7rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--orange); margin-bottom: .3rem; }
+    .tl-name { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: .4rem; }
+    .tl-desc { font-size: .9rem; color: var(--muted); line-height: 1.8; }
+
+    /* TESTIMONIALS */
+    .tquotes { display: flex; flex-direction: column; gap: 2.5rem; }
+    .tq { padding: 2rem 0; border-top: 1px solid var(--rule); }
+    .tq:first-child { border-top: 0; padding-top: 0; }
+    .tq-q { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.05rem; color: var(--text); line-height: 1.7; margin-bottom: 1rem; }
+    .tq-name { font-size: .8rem; font-weight: 600; color: var(--text); }
+    .tq-meta { font-size: .78rem; color: var(--muted); }
+
+    /* JOIN */
+    .join-items { display: flex; flex-direction: column; gap: 0; }
+    .join-item { display: grid; grid-template-columns: 1fr 3fr auto; gap: 2rem; align-items: start; padding: 2rem 0; border-top: 1px solid var(--rule); }
+    .join-item:first-child { border-top: 0; padding-top: 0; }
+    .join-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--quiet); font-weight: 400; line-height: 1; }
+    .join-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: .4rem; }
+    .join-desc { font-size: .88rem; color: var(--muted); line-height: 1.8; }
+    .join-cta a { display: inline-block; font-size: .82rem; font-weight: 600; color: var(--blue); text-decoration: none; border-bottom: 1px solid var(--blue-lt); transition: border-color .2s; white-space: nowrap; }
+    .join-cta a:hover { border-color: var(--blue); }
+    .join-item.featured .join-cta a { color: var(--orange); border-color: var(--orange-lt); }
+    .join-item.featured .join-cta a:hover { border-color: var(--orange); }
+    .join-item.featured .join-num { color: var(--orange); }
+
+    /* DONATE */
+    .donate-section { background: var(--blue-lt); padding: 5rem 0; }
+    .donate-inner { max-width: var(--measure); margin: 0 auto; padding: 0 2rem; }
+    .tiers { display: grid; grid-template-columns: repeat(2,1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin-top: 2rem; }
+    .tier { background: var(--white); padding: 1.8rem; }
+    .t-amt { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--blue-dk); }
+    .t-name { font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: .3rem 0 .5rem; }
+    .t-desc { font-size: .87rem; color: var(--mid); line-height: 1.7; }
+    .tier.featured { border-left: 3px solid var(--orange); }
+    .tier.featured .t-amt { color: var(--orange); }
+    .donate-cta { margin-top: 2.5rem; display: flex; align-items: center; gap: 1.5rem; }
+    .btn-donate { background: var(--orange); color: var(--white); padding: .8rem 2.2rem; font-size: .92rem; font-weight: 600; text-decoration: none; border-radius: 2px; transition: background .2s; }
+    .btn-donate:hover { background: #c96a1a; }
+    .donate-note { font-size: .8rem; color: var(--muted); }
+
+    /* FOOTER */
+    footer { padding: 3rem 2rem; border-top: 1px solid var(--rule); }
+    .footer-inner { max-width: var(--measure); margin: 0 auto; display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 2rem; }
+    .ft-logo { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--text); }
+    .ft-sub { font-size: .72rem; color: var(--muted); margin-top: .2rem; }
+    .ft-links { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .ft-links a { font-size: .8rem; color: var(--muted); text-decoration: none; transition: color .2s; }
+    .ft-links a:hover { color: var(--text); }
+    .ft-elaine { font-size: .78rem; color: var(--muted); font-style: italic; text-align: right; }
+    .ft-copy { font-size: .72rem; color: var(--quiet); margin-top: .3rem; text-align: right; }
+
+    @media (max-width: 680px) {
+      nav { padding: 1.2rem; }
+      .nav-links { display: none; }
+      .nums { grid-template-columns: repeat(2,1fr); }
+      .num-cell { border-right: 0; border-bottom: 1px solid var(--rule); }
+      .num-cell:nth-child(odd) { border-right: 1px solid var(--rule); }
+      .join-item { grid-template-columns: 40px 1fr; }
+      .join-cta { grid-column: 2; }
+      .tiers { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; }
+      .ft-elaine, .ft-copy { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div>
+    <div class="nav-logo">IMU</div>
+    <div class="nav-sub">Inspiring Multicultural Understanding</div>
+  </div>
+  <div class="nav-links">
+    <a href="#mission">Mission</a>
+    <a href="#story">Journey</a>
+    <a href="#voices">Voices</a>
+    <a href="#join">Get Involved</a>
+    <a href="#donate" class="nav-donate">Donate</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-kicker">Youth-Led Nonprofit · Est. 2014</div>
+  <h1 class="hero-h1">Every Student<br>Deserves <em>to Be Seen</em></h1>
+  <div class="hero-rule"></div>
+  <p class="hero-body">IMU builds empathy and belonging in K–12 schools across America through Peace Clubs, multicultural retreats, and educator workshops. Twelve years. 4,200 students. One mission.</p>
+  <div class="hero-actions">
+    <a href="#donate" class="btn-primary">Donate</a>
+    <a href="#join" class="btn-text">Get Involved →</a>
+  </div>
+</div>
+
+<hr class="rule" />
+
+<!-- NUMBERS -->
+<div class="nums">
+  <div class="num-cell"><div class="num-val">4,200+</div><div class="num-lbl">Students</div></div>
+  <div class="num-cell"><div class="num-val">38</div><div class="num-lbl">Schools</div></div>
+  <div class="num-cell"><div class="num-val">12</div><div class="num-lbl">Years</div></div>
+  <div class="num-cell"><div class="num-val">94%</div><div class="num-lbl">Feel Understood</div></div>
+</div>
+
+<!-- MISSION -->
+<div class="col">
+  <div class="section" id="mission">
+    <div class="kicker">Mission</div>
+    <h2 class="sec-h">Building Belonging,<br><em>One School at a Time</em></h2>
+    <div class="body-text">
+      <p>IMU is a youth-led nonprofit dedicated to cultivating empathy and belonging in K–12 schools. Through Peace Clubs, International Day of Peace celebrations, multicultural retreats, and educator workshops, we create conditions for every student to feel seen.</p>
+      <p>Founded in 2014 by a group of Chicago high schoolers who believed that understanding begins with listening, IMU has grown into a movement spanning 38 schools across four cities — and counting.</p>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="section" id="story">
+    <div class="kicker">Our Journey</div>
+    <h2 class="sec-h">Twelve Years of<br><em>Moments That Mattered</em></h2>
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-year">2014</div>
+        <div class="tl-name">IMU Founded in Chicago</div>
+        <div class="tl-desc">High schoolers tired of invisibility start a circle. A rule is established: listen before you speak. The first Peace Club is born.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2015</div>
+        <div class="tl-name">First International Day of Peace</div>
+        <div class="tl-desc">300 students across three schools celebrate September 21st together. A tradition that spans four cities begins in a gymnasium.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2016</div>
+        <div class="tl-name">Peace Club Network Expands</div>
+        <div class="tl-desc">Eight schools. Cross-school exchanges. Students lead dialogue sessions with peers they've never met.</div>
+      </div>
+      <div class="tl-item accent">
+        <div class="tl-year">2018</div>
+        <div class="tl-name">First Multicultural Retreat</div>
+        <div class="tl-desc">100 students, 12 cultures, one weekend. By Sunday, 94% report feeling more connected to classmates they'd never spoken to before.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2019</div>
+        <div class="tl-name">Educator Workshop Series</div>
+        <div class="tl-desc">200 teachers complete IMU's culturally responsive practices training in year one. The work enters classrooms from the front of the room.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2020</div>
+        <div class="tl-name">Pandemic — Going Virtual</div>
+        <div class="tl-desc">IMU pivots online in two weeks. Five new cities. Community doesn't need a building to hold.</div>
+      </div>
+      <div class="tl-item accent">
+        <div class="tl-year">2022</div>
+        <div class="tl-name">38 Schools. National Scale.</div>
+        <div class="tl-desc">Chicago, Los Angeles, Atlanta, New York. 4,200+ students. The numbers prove the need. The names prove the impact.</div>
+      </div>
+      <div class="tl-item now">
+        <div class="tl-year">Today · 2026</div>
+        <div class="tl-name">Your Chapter</div>
+        <div class="tl-desc">Twelve years in. The mission is unchanged. The next chapter belongs to people like you.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOICES -->
+  <div class="section" id="voices">
+    <div class="kicker">Student Voices</div>
+    <h2 class="sec-h">In Their<br><em>Own Words</em></h2>
+    <div class="tquotes">
+      <div class="tq">
+        <p class="tq-q">"Before IMU, I ate lunch alone every day for a year. Peace Club changed everything. I finally had people who wanted to know my story, not just where I was from."</p>
+        <div class="tq-name">Maya R., 17</div>
+        <div class="tq-meta">Chicago, IL · Peace Club Member</div>
+      </div>
+      <div class="tq">
+        <p class="tq-q">"IMU taught me that my culture is something to be proud of, not hidden. The retreat was the first time I didn't feel like I had to translate myself for anyone."</p>
+        <div class="tq-name">Javier M., 16</div>
+        <div class="tq-meta">Los Angeles, CA · Peace Club Leader</div>
+      </div>
+      <div class="tq">
+        <p class="tq-q">"I came to IMU's International Day of Peace not knowing anyone. I left with five new friends and a club I now help run. It really is that simple."</p>
+        <div class="tq-name">Aisha T., 18</div>
+        <div class="tq-meta">Atlanta, GA · Program Graduate</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GET INVOLVED -->
+  <div class="section" id="join">
+    <div class="kicker">Get Involved</div>
+    <h2 class="sec-h">Three Ways to<br><em>Join the Story</em></h2>
+    <div class="join-items">
+      <div class="join-item featured">
+        <div class="join-num">01</div>
+        <div>
+          <div class="join-title">Donate</div>
+          <div class="join-desc">Your gift directly funds Peace Clubs, retreats, and educator workshops. Every dollar puts belonging within reach of one more student.</div>
+        </div>
+        <div class="join-cta"><a href="#donate">Give Now →</a></div>
+      </div>
+      <div class="join-item">
+        <div class="join-num">02</div>
+        <div>
+          <div class="join-title">Volunteer</div>
+          <div class="join-desc">Facilitate workshops, mentor students, lead Peace Club sessions. Your time is exactly what our community needs.</div>
+        </div>
+        <div class="join-cta"><a href="#">Get Started →</a></div>
+      </div>
+      <div class="join-item">
+        <div class="join-num">03</div>
+        <div>
+          <div class="join-title">Partner Your School</div>
+          <div class="join-desc">School administrators: bring a Peace Club to your campus. We provide training, curriculum, and full support.</div>
+        </div>
+        <div class="join-cta"><a href="#">Learn More →</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DONATE -->
+<div class="donate-section" id="donate">
+  <div class="donate-inner">
+    <div class="kicker">Make a Gift</div>
+    <h2 class="sec-h">Your Gift, <em>Their Future</em></h2>
+    <div class="tiers">
+      <div class="tier">
+        <div class="t-amt">$25</div>
+        <div class="t-name">Supporter</div>
+        <div class="t-desc">One student's semester of Peace Club materials and resources</div>
+      </div>
+      <div class="tier featured">
+        <div class="t-amt">$100</div>
+        <div class="t-name">Champion</div>
+        <div class="t-desc">One student's full multicultural retreat experience</div>
+      </div>
+      <div class="tier">
+        <div class="t-amt">$250</div>
+        <div class="t-name">Builder</div>
+        <div class="t-desc">One educator's culturally-responsive teaching workshop</div>
+      </div>
+      <div class="tier">
+        <div class="t-amt">$1,000</div>
+        <div class="t-name">Founder</div>
+        <div class="t-desc">Launches a new Peace Club in a school without one</div>
+      </div>
+    </div>
+    <div class="donate-cta">
+      <a href="#" class="btn-donate">Donate Now</a>
+      <span class="donate-note">All donations are tax-deductible. IMU is a registered 501(c)(3).</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="ft-logo">IMU</div>
+      <div class="ft-sub">Inspiring Multicultural Understanding</div>
+    </div>
+    <div class="ft-links">
+      <a href="#">About</a>
+      <a href="#">Programs</a>
+      <a href="#">News</a>
+      <a href="#">Volunteer</a>
+      <a href="#">Partner</a>
+      <a href="#">Contact</a>
+    </div>
+    <div>
+      <div class="ft-elaine">Advocated by <em>Elaine</em>,<br>IMU Advisory Board Member</div>
+      <div class="ft-copy">© 2026 Inspiring Multicultural Understanding</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
