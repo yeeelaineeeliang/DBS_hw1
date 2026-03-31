@@ -300,57 +300,6 @@
   .card.final-card .card-link { color: var(--orange); }
   .card-link::after { content: " →"; }
 
-  /* ── REFLECTION ── */
-  .reflection {
-    background: var(--white);
-    border-top: 3px solid var(--blue);
-    margin-top: 64px;
-    padding: 64px 2rem;
-  }
-  .reflection-inner {
-    max-width: 860px;
-    margin: 0 auto;
-  }
-  .reflection h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--blue-dk);
-    margin-bottom: .5rem;
-  }
-  .reflection-rule {
-    width: 48px;
-    height: 3px;
-    background: var(--orange);
-    border: none;
-    margin-bottom: 2rem;
-  }
-  .q-block {
-    margin-bottom: 2rem;
-    padding-left: 1.25rem;
-    border-left: 3px solid var(--blue-lt);
-  }
-  .q-label {
-    font-size: .72rem;
-    font-weight: 700;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--blue);
-    margin-bottom: .4rem;
-  }
-  .q-text {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.05rem;
-    font-style: italic;
-    color: var(--text);
-    margin-bottom: .6rem;
-  }
-  .q-answer {
-    font-size: .95rem;
-    color: var(--mid);
-    line-height: 1.8;
-  }
-
   /* ── ADVISORY ── */
   .advisory-band {
     background: var(--orange-lt);
@@ -844,38 +793,6 @@
   </div>
 
 </div><!-- /phases -->
-
-<!-- REFLECTION -->
-<section class="reflection">
-  <div class="reflection-inner">
-    <h2>Process Reflection</h2>
-    <hr class="reflection-rule">
-
-    <div class="q-block">
-      <div class="q-label">Question 1</div>
-      <div class="q-text">How did your file and folder structure help (or hurt) your design pipeline?</div>
-      <div class="q-answer">
-        A flat folder structure — all 25 <code>v*.html</code> files in one directory — kept iteration fast. Each version was a full standalone file: no build step, no asset dependencies to track, no broken imports. The tradeoff was that later versions had to manually carry forward content and style changes from earlier ones, which meant occasionally re-discovering decisions made three versions back. In retrospect, a single shared CSS file for the converging palette variables (v13+) would have reduced copy-forward friction, but for a 25-version exploration it would have also created coupling that might have discouraged bolder visual experiments in early phases.
-      </div>
-    </div>
-
-    <div class="q-block">
-      <div class="q-label">Question 2</div>
-      <div class="q-text">What would you change about your design process or pipeline?</div>
-      <div class="q-answer">
-        The biggest thing I'd change is where the audience definition happened. I spent the first 12 versions exploring aesthetic registers (cinematic dark mode, editorial, data-led) before anchoring to the primary visitor — someone who wants to donate, volunteer, or connect as a school administrator, with donate as the highest-priority action. Had I defined that hierarchy on day one, I might have collapsed the 25 versions into a tighter 12–15. On the technical side, I'd adopt a design token sheet shared across versions earlier, so palette changes (like switching to IMU's actual #2ea3f2 brand blue in v13) propagated automatically rather than requiring manual find-and-replace in a standalone file.
-      </div>
-    </div>
-
-    <div class="q-block">
-      <div class="q-label">Question 3</div>
-      <div class="q-text">Why did you choose v25 as your final design?</div>
-      <div class="q-answer">
-        v25 wins on hierarchy, honesty, and friction reduction — the three things that matter most for a nonprofit donate page. The donate pathway card is visually dominant before a single word is read (the wider grid column is a spatial argument, not a label). The alternating photo timeline earns trust by telling the story chronologically — showing where IMU started, what it built, and who it changed — before asking for anything. And the interactive layer (sticky donate bar, amount chip picker, scroll-triggered animations) removes decision friction: the visitor doesn't need to scroll to find the ask, and they don't need to type a dollar amount because the common tiers are one tap away. v25 is also the first version where Elaine's advisory role is featured prominently rather than buried in the footer — which matters because personal advocacy from a board member is one of the strongest trust signals a small nonprofit can offer.
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ADVISORY -->
 <div class="advisory-band">
