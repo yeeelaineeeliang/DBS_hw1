@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMU — Every Student Deserves to Be Seen</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Barlow+Condensed:wght@300;400;500;600;700&family=Inter:wght@300;400&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0806;
+      --surface:   #141008;
+      --surface-2: #1c1408;
+      --amber:     #e8922a;
+      --amber-lt:  #f2b05a;
+      --gold:      #c8a030;
+      --warm:      #f0e8d8;
+      --warm-mid:  rgba(240,232,216,.55);
+      --warm-soft: rgba(240,232,216,.32);
+      --warm-faint:rgba(240,232,216,.16);
+      --rule:      rgba(232,146,42,.3);
+    }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+    body {
+      background: var(--bg);
+      color: var(--warm);
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ── FILM GRAIN (fixed overlay) ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.1'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9998;
+      opacity: .5;
+      mix-blend-mode: overlay;
+    }
+
+    /* ── KEYFRAMES ── */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes drift {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-6px); }
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 1.4rem 2.5rem;
+      transition: background .4s, backdrop-filter .4s;
+    }
+
+    nav.scrolled {
+      background: rgba(10,8,6,.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.3rem;
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: .08em;
+      color: var(--warm);
+      text-decoration: none;
+    }
+
+    .nav-center {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .58rem;
+      font-weight: 400;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--warm-soft);
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .nav-right {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .68rem;
+      font-weight: 400;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--warm-soft);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .nav-link:hover { color: var(--amber-lt); }
+
+    .nav-give {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--amber);
+      padding: .42rem 1.2rem;
+      text-decoration: none;
+      transition: background .2s;
+    }
+
+    .nav-give:hover { background: var(--amber-lt); }
+
+    @media (max-width: 640px) {
+      nav { grid-template-columns: 1fr 1fr; }
+      .nav-center { display: none; }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    /* Letterbox bars */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 9vh;
+      background: var(--bg);
+      z-index: 3;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 9vh;
+      background: var(--bg);
+      z-index: 3;
+    }
+
+    /* Amber radial glow */
+    .hero-glow {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 65% 55% at 50% 52%, rgba(200,120,20,.13) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 35% at 30% 70%, rgba(100,50,10,.15) 0%, transparent 55%);
+      z-index: 1;
+    }
+
+    /* Vignette */
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 90% 85% at 50% 50%, transparent 40%, rgba(10,8,6,.85) 100%);
+      z-index: 2;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 4;
+      text-align: center;
+      padding: 0 2rem;
+      max-width: 900px;
+      animation: fade-in 1.2s .3s ease both;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .68rem;
+      font-weight: 400;
+      letter-spacing: .42em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      width: 40px;
+      height: 1px;
+      background: var(--amber);
+      opacity: .5;
+    }
+
+    .hero-h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(3.2rem, 9vw, 8.5rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.0;
+      letter-spacing: -.01em;
+      color: var(--warm);
+      margin-bottom: 2.4rem;
+    }
+
+    .hero-h1 .word-seen {
+      color: var(--amber-lt);
+      font-weight: 400;
+    }
+
+    .hero-rule {
+      width: 100%;
+      max-width: 480px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--amber), transparent);
+      margin: 0 auto 2rem;
+      opacity: .5;
+    }
+
+    .hero-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .88rem;
+      font-weight: 300;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--warm-mid);
+      line-height: 1.9;
+    }
+
+    .hero-sub .sep {
+      color: var(--amber);
+      margin: 0 .6em;
+      opacity: .6;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 10vh;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .6rem;
+      font-weight: 400;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--warm-faint);
+      animation: drift 2s 1.5s ease-in-out infinite alternate;
+    }
+
+    .scroll-chevron {
+      font-size: .9rem;
+      color: var(--amber);
+      opacity: .5;
+    }
+
+    /* ── AMBER FULL-WIDTH RULE ── */
+    .amber-rule {
+      height: 1px;
+      background: linear-gradient(to right, transparent 0%, var(--amber) 20%, var(--amber) 80%, transparent 100%);
+      opacity: .25;
+    }
+
+    /* ── CREDITS STRIP ── */
+    .credits-strip {
+      background: var(--bg);
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 3.5rem 2rem;
+    }
+
+    .credits-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+
+    @media (max-width: 600px) { .credits-inner { grid-template-columns: 1fr 1fr; gap: 2.5rem 0; } }
+
+    .credit-item {
+      text-align: center;
+      padding: 0 2rem;
+      border-right: 1px solid var(--rule);
+      animation: fade-up .6s ease both;
+    }
+
+    .credit-item:last-child { border-right: none; }
+    .credit-item:nth-child(1) { animation-delay: .1s; }
+    .credit-item:nth-child(2) { animation-delay: .2s; }
+    .credit-item:nth-child(3) { animation-delay: .3s; }
+    .credit-item:nth-child(4) { animation-delay: .4s; }
+
+    .credit-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(2.8rem, 5vw, 4.2rem);
+      font-weight: 600;
+      letter-spacing: -.02em;
+      line-height: 1;
+      color: var(--amber-lt);
+    }
+
+    .credit-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .62rem;
+      font-weight: 400;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--warm-soft);
+      margin-top: .6rem;
+      line-height: 1.4;
+    }
+
+    /* ── SECTION WRAPPER ── */
+    .wrap {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ── ACT HEADER ── */
+    .act-header {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      margin-bottom: 3rem;
+    }
+
+    .act-header::before,
+    .act-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    .act-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .6rem;
+      font-weight: 600;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      color: var(--amber);
+      white-space: nowrap;
+    }
+
+    /* ── MISSION — ACT I ── */
+    .mission-section {
+      background: #0d0a06;
+      padding: 7rem 2rem;
+    }
+
+    .mission-body {
+      max-width: 640px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .mission-h {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--warm);
+      line-height: 1.3;
+      margin-bottom: 2rem;
+      animation: fade-up .7s .1s ease both;
+    }
+
+    .mission-prose {
+      font-family: 'Inter', sans-serif;
+      font-size: .92rem;
+      font-weight: 300;
+      color: var(--warm-mid);
+      line-height: 1.9;
+      animation: fade-up .7s .2s ease both;
+    }
+
+    .mission-prose + .mission-prose { margin-top: 1.1em; }
+
+    /* intertitle pull-quote */
+    .intertitle {
+      margin: 4rem 0;
+      padding: 2.8rem 0;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      text-align: center;
+      animation: fade-up .7s .3s ease both;
+    }
+
+    .intertitle blockquote {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.4rem, 3vw, 2.1rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--warm);
+      line-height: 1.45;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .intertitle blockquote em {
+      font-style: normal;
+      color: var(--amber-lt);
+    }
+
+    .intertitle-attr {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .6rem;
+      font-weight: 400;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--warm-soft);
+      margin-top: 1.4rem;
+    }
+
+    /* ── PILLARS — ACT II ── */
+    .pillars-section {
+      background: var(--bg);
+      padding: 7rem 2rem;
+    }
+
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      animation: fade-up .6s .1s ease both;
+    }
+
+    @media (max-width: 640px) { .pillars-grid { grid-template-columns: 1fr; } }
+
+    .pillar-card {
+      background: var(--surface);
+      padding: 2.8rem 2.5rem;
+      position: relative;
+      transition: background .25s;
+    }
+
+    .pillar-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--amber);
+      opacity: 0;
+      transition: opacity .25s;
+    }
+
+    .pillar-card:hover { background: var(--surface-2); }
+    .pillar-card:hover::before { opacity: 1; }
+
+    .pillar-numeral {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.4rem;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--amber);
+      opacity: .6;
+      line-height: 1;
+      margin-bottom: .8rem;
+    }
+
+    .pillar-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--warm);
+      margin-bottom: .75rem;
+    }
+
+    .pillar-body {
+      font-family: 'Inter', sans-serif;
+      font-size: .85rem;
+      font-weight: 300;
+      color: var(--warm-mid);
+      line-height: 1.8;
+    }
+
+    /* ── TESTIMONIALS — ACT III ── */
+    .voices-section {
+      background: #0d0a06;
+      padding: 7rem 2rem;
+    }
+
+    .voices-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 820px) { .voices-grid { grid-template-columns: 1fr; } }
+
+    .voice-card {
+      background: var(--surface);
+      border-left: 2px solid var(--amber);
+      padding: 2rem 1.8rem 1.6rem;
+      position: relative;
+      animation: fade-up .6s ease both;
+      transition: border-color .25s;
+    }
+
+    .voice-card:hover { border-color: var(--amber-lt); }
+
+    .voice-card:nth-child(1) { animation-delay: .1s; }
+    .voice-card:nth-child(2) { animation-delay: .22s; }
+    .voice-card:nth-child(3) { animation-delay: .34s; }
+
+    .voice-subject {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .58rem;
+      font-weight: 600;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1.2rem;
+    }
+
+    .voice-quote {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.08rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--warm);
+      line-height: 1.7;
+      flex: 1;
+    }
+
+    .voice-rule {
+      height: 1px;
+      background: var(--rule);
+      margin: 1.4rem 0 1rem;
+    }
+
+    .voice-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--warm-mid);
+    }
+
+    .voice-role {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .62rem;
+      font-weight: 300;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--warm-soft);
+      margin-top: .2rem;
+    }
+
+    /* ── WIDE INTERTITLE — full bleed ── */
+    .wide-intertitle {
+      background: var(--bg);
+      padding: 8rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wide-intertitle::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(200,120,20,.09) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .wi-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .wi-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .6rem;
+      font-weight: 400;
+      letter-spacing: .36em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 2.2rem;
+    }
+
+    .wi-quote {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.8rem, 4.5vw, 3.4rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--warm);
+      line-height: 1.25;
+      letter-spacing: -.01em;
+    }
+
+    .wi-quote em {
+      font-style: normal;
+      color: var(--amber-lt);
+    }
+
+    /* ── DONATE — FINALE ── */
+    .donate-section {
+      background: #0d0a06;
+      padding: 8rem 2rem 7rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .donate-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 55% at 50% 40%, rgba(200,120,20,.12) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 40% at 15% 80%, rgba(150,80,10,.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .donate-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .donate-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .6rem;
+      font-weight: 400;
+      letter-spacing: .4em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 2rem;
+    }
+
+    .donate-h {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--warm);
+      line-height: 1.1;
+      letter-spacing: -.01em;
+      margin-bottom: .6rem;
+    }
+
+    .donate-sub-h {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1rem;
+      font-weight: 300;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--warm-soft);
+      margin-bottom: 1.6rem;
+    }
+
+    .donate-rule {
+      width: 60px;
+      height: 1px;
+      background: var(--amber);
+      margin: 0 auto 2.5rem;
+      opacity: .5;
+    }
+
+    .donate-body {
+      font-family: 'Inter', sans-serif;
+      font-size: .9rem;
+      font-weight: 300;
+      color: var(--warm-mid);
+      max-width: 500px;
+      margin: 0 auto 4rem;
+      line-height: 1.85;
+    }
+
+    /* Tiers styled as film credits */
+    .tiers {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      margin-bottom: 3.5rem;
+      text-align: left;
+    }
+
+    @media (max-width: 640px) { .tiers { grid-template-columns: 1fr 1fr; } }
+
+    .tier {
+      background: var(--surface);
+      padding: 1.5rem 1.4rem;
+      transition: background .2s;
+    }
+
+    .tier:hover { background: var(--surface-2); }
+
+    .tier-amt {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.6rem;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--amber-lt);
+      line-height: 1;
+      margin-bottom: .5rem;
+    }
+
+    .tier-desc {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .68rem;
+      font-weight: 300;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--warm-soft);
+      line-height: 1.5;
+    }
+
+    .donate-btns {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-amber {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--amber);
+      padding: .9rem 2.8rem;
+      text-decoration: none;
+      transition: background .2s;
+      display: inline-block;
+    }
+
+    .btn-amber:hover { background: var(--amber-lt); }
+
+    .btn-ghost {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--warm-soft);
+      background: transparent;
+      border: 1px solid rgba(240,232,216,.2);
+      padding: .88rem 2.8rem;
+      text-decoration: none;
+      transition: border-color .2s, color .2s;
+      display: inline-block;
+    }
+
+    .btn-ghost:hover { border-color: var(--warm-soft); color: var(--warm); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #060504;
+      border-top: 1px solid var(--rule);
+      padding: 3rem 2.5rem 2.2rem;
+    }
+
+    .footer-inner {
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(240,232,216,.06);
+      margin-bottom: 1.8rem;
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      font-weight: 300;
+      letter-spacing: .1em;
+      color: var(--warm-soft);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.8rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .62rem;
+      font-weight: 300;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(240,232,216,.22);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .footer-links a:hover { color: var(--amber-lt); }
+
+    .footer-base {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .8rem;
+    }
+
+    .footer-advocate {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: .9rem;
+      font-style: italic;
+      font-weight: 300;
+      color: rgba(240,232,216,.28);
+    }
+
+    .footer-advocate strong {
+      color: var(--amber);
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    .footer-copy {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .58rem;
+      font-weight: 300;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(240,232,216,.15);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav id="nav">
+    <a class="nav-logo" href="#">IMU</a>
+    <span class="nav-center">Inspiring Multicultural Understanding</span>
+    <div class="nav-right">
+      <a class="nav-link" href="#mission">Story</a>
+      <a class="nav-link" href="#voices">Voices</a>
+      <a class="nav-give" href="#donate">Give</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-vignette"></div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">A Documentary &nbsp;·&nbsp; Est. 2014</div>
+      <h1 class="hero-h1">
+        Every Student<br>
+        Deserves to Be<br>
+        <span class="word-seen">Seen</span>
+      </h1>
+      <div class="hero-rule"></div>
+      <p class="hero-sub">
+        Youth <span class="sep">|</span>
+        Culture <span class="sep">|</span>
+        Dialogue <span class="sep">|</span>
+        Belonging
+      </p>
+    </div>
+
+    <div class="hero-scroll">
+      <span class="scroll-chevron">▾</span>
+      The Story
+    </div>
+  </section>
+
+  <!-- ── CREDITS STRIP ── -->
+  <div class="credits-strip">
+    <div class="credits-inner">
+      <div class="credit-item">
+        <div class="credit-num">4,200<span style="font-size:.55em;font-weight:300;">+</span></div>
+        <div class="credit-label">Students<br>Reached</div>
+      </div>
+      <div class="credit-item">
+        <div class="credit-num">38</div>
+        <div class="credit-label">Partner<br>Schools</div>
+      </div>
+      <div class="credit-item">
+        <div class="credit-num">12</div>
+        <div class="credit-label">Years<br>Active</div>
+      </div>
+      <div class="credit-item">
+        <div class="credit-num">94<span style="font-size:.55em;font-weight:300;">%</span></div>
+        <div class="credit-label">Feel More<br>Understood</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MISSION — ACT I ── -->
+  <section class="mission-section" id="mission">
+    <div class="wrap">
+
+      <div class="act-header">
+        <span class="act-label">Act I &nbsp;—&nbsp; Who We Are</span>
+      </div>
+
+      <div class="mission-body">
+        <h2 class="mission-h">
+          Building bridges,<br>one conversation at a time.
+        </h2>
+        <p class="mission-prose">
+          Inspiring Multicultural Understanding is a youth-led nonprofit dedicated
+          to cultivating empathy and belonging in K–12 schools across the country.
+          We create structured dialogue programs where students explore questions
+          of identity, culture, and race — not as threats, not as abstractions,
+          but as invitations to see one another fully.
+        </p>
+        <p class="mission-prose">
+          For twelve years we have worked alongside educators and communities
+          to build something simple and rare: classrooms where every heritage,
+          every story, and every identity is not merely tolerated — but genuinely
+          welcomed.
+        </p>
+
+        <div class="intertitle">
+          <blockquote>
+            "A classroom where every student feels seen is not a utopia.
+            It is a choice — one that must be made <em>deliberately</em>,
+            and together."
+          </blockquote>
+          <p class="intertitle-attr">— IMU Program Director</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── PILLARS — ACT II ── -->
+  <section class="pillars-section" id="pillars">
+    <div class="wrap">
+
+      <div class="act-header">
+        <span class="act-label">Act II &nbsp;—&nbsp; How We Work</span>
+      </div>
+
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-numeral">I.</div>
+          <div class="pillar-title">Open Dialogue</div>
+          <p class="pillar-body">Safe, facilitated spaces for honest conversations about race, culture, and identity — structured to build trust before depth, in every school we enter.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-numeral">II.</div>
+          <div class="pillar-title">Student Voice</div>
+          <p class="pillar-body">Programs co-designed with young people, centering their lived experience. Their stories are not a supplement to the curriculum — they are the curriculum.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-numeral">III.</div>
+          <div class="pillar-title">Educator Partnership</div>
+          <p class="pillar-body">Deep collaboration with teachers and administrators to make inclusion not a module that comes and goes, but a permanent feature of school culture.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-numeral">IV.</div>
+          <div class="pillar-title">Youth Leadership</div>
+          <p class="pillar-body">Students trained as facilitators carry the work forward long after we leave — multiplying our impact far beyond any single program or semester.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── TESTIMONIALS — ACT III ── -->
+  <section class="voices-section" id="voices">
+    <div class="wrap">
+
+      <div class="act-header">
+        <span class="act-label">Act III &nbsp;—&nbsp; The Students</span>
+      </div>
+
+      <div class="voices-grid">
+
+        <div class="voice-card">
+          <div class="voice-subject">Subject 01 &nbsp;·&nbsp; Chicago</div>
+          <p class="voice-quote">
+            "Before IMU, I never talked about being biracial at school.
+            I thought no one would understand. In my first dialogue circle,
+            a girl I barely knew started crying because she felt the exact
+            same way. We became best friends. That's what IMU does — it
+            makes you realize you're never as alone as you think."
+          </p>
+          <div class="voice-rule"></div>
+          <div class="voice-name">Maya R., 17</div>
+          <div class="voice-role">Student Participant &nbsp;·&nbsp; Chicago, Illinois</div>
+        </div>
+
+        <div class="voice-card">
+          <div class="voice-subject">Subject 02 &nbsp;·&nbsp; Los Angeles</div>
+          <p class="voice-quote">
+            "I grew up in a mostly white school and never saw my culture
+            reflected anywhere. IMU was the first time I heard my language
+            and my traditions spoken about with real respect. I finally
+            felt like I belonged — not despite who I am, but because of it."
+          </p>
+          <div class="voice-rule"></div>
+          <div class="voice-name">Javier M., 16</div>
+          <div class="voice-role">Student Leader &nbsp;·&nbsp; Los Angeles, California</div>
+        </div>
+
+        <div class="voice-card">
+          <div class="voice-subject">Subject 03 &nbsp;·&nbsp; Atlanta</div>
+          <p class="voice-quote">
+            "I used to be afraid to bring up race in class. IMU trained me
+            to lead conversations I once avoided entirely. Now I run
+            dialogue circles at my own school. This program didn't just
+            change my school — it changed who I am."
+          </p>
+          <div class="voice-rule"></div>
+          <div class="voice-name">Aisha T., 18</div>
+          <div class="voice-role">Youth Facilitator &nbsp;·&nbsp; Atlanta, Georgia</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── WIDE INTERTITLE ── -->
+  <div class="wide-intertitle">
+    <div class="wi-inner">
+      <p class="wi-label">The Mission</p>
+      <p class="wi-quote">
+        "A student who feels <em>unseen</em> cannot learn.
+        Cannot lead. Cannot become who they were meant to be."
+      </p>
+    </div>
+  </div>
+
+  <!-- ── DONATE — FINALE ── -->
+  <section class="donate-section" id="donate">
+    <div class="donate-inner">
+      <p class="donate-eyebrow">Finale &nbsp;—&nbsp; Write the Next Scene</p>
+      <h2 class="donate-h">The story<br>isn't finished.</h2>
+      <p class="donate-sub-h">Help us keep it going.</p>
+      <div class="donate-rule"></div>
+      <p class="donate-body">
+        Every dollar funds the dialogue programs, facilitator training, and school
+        partnerships that make this work real. No student should have to navigate
+        questions of belonging alone. Your gift changes that.
+      </p>
+
+      <div class="tiers">
+        <div class="tier">
+          <div class="tier-amt">$25</div>
+          <div class="tier-desc">One student's<br>full semester</div>
+        </div>
+        <div class="tier">
+          <div class="tier-amt">$100</div>
+          <div class="tier-desc">One complete<br>dialogue circle</div>
+        </div>
+        <div class="tier">
+          <div class="tier-amt">$250</div>
+          <div class="tier-desc">One youth<br>facilitator trained</div>
+        </div>
+        <div class="tier">
+          <div class="tier-amt">$1,000</div>
+          <div class="tier-desc">One new school<br>for a semester</div>
+        </div>
+      </div>
+
+      <div class="donate-btns">
+        <a href="#" class="btn-amber">Donate Now</a>
+        <a href="#" class="btn-ghost">Volunteer</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <span class="footer-logo">IMU — Inspiring Multicultural Understanding</span>
+        <div class="footer-links">
+          <a href="#">About</a>
+          <a href="#">Programs</a>
+          <a href="#">Schools</a>
+          <a href="#">Volunteer</a>
+          <a href="#">Press</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+      <div class="footer-base">
+        <p class="footer-advocate">
+          Advocated by <strong>Elaine</strong>, IMU Advisory Board Member.
+        </p>
+        <p class="footer-copy">© 2026 IMU &nbsp;·&nbsp; 501(c)(3) Nonprofit &nbsp;·&nbsp; Est. 2014</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+  </script>
+
+</body>
+</html>
