@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMU — Every Voice</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400;1,9..144,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #faf5ec;
+      --ink:      #1e1508;
+      --ink-mid:  #4a3820;
+      --ink-soft: #8a7050;
+      --border:   rgba(30,21,8,.1);
+    }
+
+    html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      line-height: 1.55;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-left {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-logo {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: .02em;
+      line-height: 1;
+    }
+
+    .nav-sub {
+      font-size: .58rem;
+      font-weight: 300;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-top: .18rem;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.6rem;
+    }
+
+    .nav-link {
+      font-size: .7rem;
+      font-weight: 500;
+      letter-spacing: .08em;
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .nav-link:hover { color: var(--ink); }
+
+    .nav-btn {
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-decoration: none;
+      color: #fff;
+      background: var(--ink);
+      padding: .48rem 1.2rem;
+      border-radius: 2px;
+      transition: background .2s;
+      white-space: nowrap;
+    }
+
+    .nav-btn:hover { background: var(--ink-mid); }
+
+    /* ── INTRO BANNER ── */
+    .intro-banner {
+      padding: 2.4rem 2rem 0;
+      max-width: 740px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .ib-kicker {
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: .9rem;
+    }
+
+    .ib-head {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(1.7rem, 4vw, 2.8rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--ink);
+      line-height: 1.2;
+      letter-spacing: -.01em;
+      margin-bottom: .7rem;
+    }
+
+    .ib-sub {
+      font-size: .88rem;
+      font-weight: 300;
+      color: var(--ink-soft);
+      line-height: 1.7;
+    }
+
+    /* ── MOSAIC GRID ── */
+    .mosaic-section {
+      padding: 2.2rem 1.5rem 0;
+    }
+
+    .mosaic {
+      columns: 4 260px;
+      column-gap: .85rem;
+    }
+
+    /* each card */
+    .card {
+      break-inside: avoid;
+      display: block;
+      border-radius: 14px;
+      padding: 1.7rem 1.6rem 1.5rem;
+      margin-bottom: .85rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+      cursor: default;
+    }
+
+    .card:hover {
+      transform: translateY(-4px) rotate(.3deg);
+      box-shadow: 0 12px 36px rgba(0,0,0,.13);
+    }
+
+    /* ── CARD COLOUR THEMES ── */
+    /* Each card gets a bg color + text variant (light or dark) */
+
+    .c-terracotta { background: #d96b4a; color: #fff; }
+    .c-amber      { background: #e8a030; color: #1e1508; }
+    .c-sage       { background: #5e9e6e; color: #fff; }
+    .c-rose       { background: #d46075; color: #fff; }
+    .c-gold       { background: #c89820; color: #1e1508; }
+    .c-teal       { background: #4a9898; color: #fff; }
+    .c-peach      { background: #f0a060; color: #1e1508; }
+    .c-mauve      { background: #a8688a; color: #fff; }
+    .c-olive      { background: #7a9838; color: #fff; }
+    .c-coral      { background: #e05848; color: #fff; }
+    .c-sky        { background: #4878b0; color: #fff; }
+    .c-ochre      { background: #c07828; color: #fff; }
+    .c-lavender   { background: #8870c0; color: #fff; }
+    .c-moss       { background: #507858; color: #fff; }
+    .c-blush      { background: #e08878; color: #fff; }
+    .c-dusk       { background: #5a5088; color: #fff; }
+    .c-sienna     { background: #b05030; color: #fff; }
+    .c-lime       { background: #6aaa40; color: #fff; }
+    .c-sand       { background: #d4a860; color: #1e1508; }
+    .c-indigo     { background: #3858a0; color: #fff; }
+
+    /* light text cards: quote in white/cream */
+    .card-light .card-quote  { color: rgba(255,255,255,.95); }
+    .card-light .card-footer { border-top-color: rgba(255,255,255,.2); }
+    .card-light .card-name   { color: rgba(255,255,255,.95); }
+    .card-light .card-school { color: rgba(255,255,255,.6); }
+
+    /* dark text cards: quote in near-black */
+    .card-dark .card-quote  { color: rgba(30,21,8,.88); }
+    .card-dark .card-footer { border-top-color: rgba(30,21,8,.15); }
+    .card-dark .card-name   { color: rgba(30,21,8,.9); }
+    .card-dark .card-school { color: rgba(30,21,8,.55); }
+
+    /* inner texture dot */
+    .card::before {
+      content: '';
+      position: absolute;
+      bottom: -30px; right: -30px;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      pointer-events: none;
+    }
+
+    /* ── CARD CONTENT ── */
+    .card-quote {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(.9rem, 1.5vw, 1.05rem);
+      font-style: italic;
+      font-weight: 300;
+      line-height: 1.65;
+      margin-bottom: 1.2rem;
+    }
+
+    /* Big accent cards (stat or short phrase) */
+    .card-accent .card-quote {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-style: normal;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -.01em;
+    }
+
+    .card-accent .card-sub {
+      font-size: .78rem;
+      font-weight: 300;
+      font-style: italic;
+      margin-top: .4rem;
+      opacity: .75;
+    }
+
+    /* Stat card */
+    .card-stat .stat-num {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(3rem, 6vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -.03em;
+    }
+
+    .card-stat .stat-label {
+      font-size: .72rem;
+      font-weight: 400;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-top: .4rem;
+      opacity: .7;
+    }
+
+    /* ── CARD FOOTER ── */
+    .card-footer {
+      border-top: 1px solid;
+      padding-top: .75rem;
+    }
+
+    .card-name {
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+      line-height: 1.2;
+    }
+
+    .card-school {
+      font-size: .68rem;
+      font-weight: 300;
+      margin-top: .15rem;
+      letter-spacing: .02em;
+    }
+
+    /* ── POST-GRID DIVIDER ── */
+    .grid-end {
+      padding: 2.4rem 2rem 0;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      max-width: 100%;
+    }
+
+    .grid-end::before,
+    .grid-end::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .grid-end-label {
+      font-size: .62rem;
+      font-weight: 500;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      white-space: nowrap;
+    }
+
+    /* ── MISSION SECTION ── */
+    .mission {
+      padding: 5.5rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .mission-label {
+      font-size: .62rem;
+      font-weight: 500;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 1.2rem;
+    }
+
+    .mission-h {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--ink);
+      line-height: 1.25;
+      letter-spacing: -.01em;
+      margin-bottom: 1.4rem;
+    }
+
+    .mission-body {
+      font-size: .95rem;
+      font-weight: 300;
+      color: var(--ink-mid);
+      line-height: 1.9;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .mission-body + .mission-body { margin-top: 1em; }
+
+    /* ── STATS ROW ── */
+    .stats {
+      background: var(--ink);
+      padding: 3.2rem 2rem;
+    }
+
+    .stats-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+
+    @media (max-width: 600px) { .stats-inner { grid-template-columns: 1fr 1fr; } }
+
+    .stat {
+      text-align: center;
+      padding: 0 2rem;
+      border-right: 1px solid rgba(255,255,255,.1);
+    }
+
+    .stat:last-child { border-right: none; }
+
+    .stat-n {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      color: #f0e8d8;
+      letter-spacing: -.03em;
+      line-height: 1;
+    }
+
+    .stat-l {
+      font-size: .62rem;
+      font-weight: 400;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.38);
+      margin-top: .55rem;
+    }
+
+    /* ── DONATE ── */
+    .donate {
+      padding: 6.5rem 2rem;
+      background: var(--bg);
+      text-align: center;
+    }
+
+    .donate-label {
+      font-size: .62rem;
+      font-weight: 500;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 1.2rem;
+    }
+
+    .donate-h {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--ink);
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      margin-bottom: 1rem;
+    }
+
+    .donate-h strong {
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .donate-body {
+      font-size: .92rem;
+      font-weight: 300;
+      color: var(--ink-mid);
+      max-width: 480px;
+      margin: 0 auto 3rem;
+      line-height: 1.85;
+    }
+
+    /* Tier grid */
+    .tiers {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .75rem;
+      max-width: 780px;
+      margin: 0 auto 3rem;
+    }
+
+    @media (max-width: 600px) { .tiers { grid-template-columns: 1fr 1fr; } }
+
+    .tier {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.3rem 1rem;
+      text-align: left;
+      background: #fff;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .tier:hover {
+      border-color: rgba(30,21,8,.25);
+      box-shadow: 0 4px 16px rgba(0,0,0,.07);
+    }
+
+    .tier-amt {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-style: italic;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: .4rem;
+    }
+
+    .tier-desc {
+      font-size: .75rem;
+      font-weight: 300;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    .donate-btns {
+      display: flex;
+      justify-content: center;
+      gap: .9rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--ink);
+      padding: .9rem 2.5rem;
+      border-radius: 3px;
+      text-decoration: none;
+      transition: background .2s;
+    }
+
+    .btn-primary:hover { background: var(--ink-mid); }
+
+    .btn-secondary {
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      border: 1px solid var(--border);
+      padding: .88rem 2.5rem;
+      border-radius: 3px;
+      text-decoration: none;
+      transition: border-color .2s, color .2s;
+    }
+
+    .btn-secondary:hover { border-color: rgba(30,21,8,.3); color: var(--ink); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      padding: 2.8rem 2rem 2rem;
+    }
+
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      margin-bottom: 1.6rem;
+    }
+
+    .f-logo {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1rem;
+      font-style: italic;
+      font-weight: 300;
+      color: rgba(255,255,255,.7);
+    }
+
+    .f-links {
+      display: flex;
+      gap: 1.6rem;
+      flex-wrap: wrap;
+    }
+
+    .f-links a {
+      font-size: .63rem;
+      font-weight: 300;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .f-links a:hover { color: rgba(255,255,255,.7); }
+
+    .footer-base {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .8rem;
+    }
+
+    .f-advocate {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: .9rem;
+      font-style: italic;
+      color: rgba(255,255,255,.3);
+    }
+
+    .f-advocate strong { color: #e8a030; font-style: normal; }
+
+    .f-copy {
+      font-size: .62rem;
+      font-weight: 300;
+      letter-spacing: .1em;
+      color: rgba(255,255,255,.18);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) { .mosaic { columns: 3 220px; } }
+    @media (max-width: 640px) {
+      .mosaic { columns: 2 160px; column-gap: .6rem; }
+      .mosaic-section { padding: 1.5rem 1rem 0; }
+      nav .nav-link { display: none; }
+    }
+    @media (max-width: 420px) {
+      .mosaic { columns: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav>
+    <div class="nav-left">
+      <a class="nav-logo" href="#">IMU</a>
+      <span class="nav-sub">Inspiring Multicultural Understanding</span>
+    </div>
+    <div class="nav-right">
+      <a class="nav-link" href="#mission">About</a>
+      <a class="nav-link" href="#donate">Impact</a>
+      <a class="nav-btn" href="#donate">Donate</a>
+    </div>
+  </nav>
+
+  <!-- ── INTRO ── -->
+  <div class="intro-banner">
+    <p class="ib-kicker">A Community of Voices — Est. 2014</p>
+    <h1 class="ib-head">Every student deserves to be seen.</h1>
+    <p class="ib-sub">
+      Here is what that looks like — in the words of the young people
+      who lived it.
+    </p>
+  </div>
+
+  <!-- ══════════════════════════════════
+       MOSAIC GRID — THE HERO
+  ══════════════════════════════════ -->
+  <section class="mosaic-section" aria-label="Community voices">
+    <div class="mosaic">
+
+      <!-- 1 -->
+      <div class="card c-terracotta card-light">
+        <p class="card-quote">"Before IMU, I never talked about being biracial at school. In my first dialogue circle, a girl I barely knew started crying because she felt the exact same way. We became best friends. That's what IMU does — it makes you realize you're never as alone as you think."</p>
+        <div class="card-footer">
+          <div class="card-name">Maya R., 17</div>
+          <div class="card-school">Student Participant · Chicago, IL</div>
+        </div>
+      </div>
+
+      <!-- 2 — stat accent -->
+      <div class="card c-gold card-dark card-stat">
+        <div class="stat-num">4,200+</div>
+        <div class="stat-label">Students reached</div>
+      </div>
+
+      <!-- 3 -->
+      <div class="card c-sage card-light">
+        <p class="card-quote">"I grew up in a mostly white school and never saw my culture reflected anywhere. IMU was the first time I heard my language and traditions spoken about with real respect. I finally felt like I belonged — not despite who I am, but because of it."</p>
+        <div class="card-footer">
+          <div class="card-name">Javier M., 16</div>
+          <div class="card-school">Student Leader · Los Angeles, CA</div>
+        </div>
+      </div>
+
+      <!-- 4 — short quote -->
+      <div class="card c-rose card-light">
+        <p class="card-quote">"I stopped shrinking."</p>
+        <div class="card-footer">
+          <div class="card-name">Amara J., 17</div>
+          <div class="card-school">Lincoln High School · Atlanta, GA</div>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="card c-sky card-light">
+        <p class="card-quote">"My teacher said she learned as much as we did. I think that means it worked."</p>
+        <div class="card-footer">
+          <div class="card-name">Daniel K., 16</div>
+          <div class="card-school">Jefferson High School · Chicago, IL</div>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="card c-amber card-dark">
+        <p class="card-quote">"I used to keep two versions of myself — the one at home and the one at school. IMU was the first place they were the same person."</p>
+        <div class="card-footer">
+          <div class="card-name">Jasmine W., 16</div>
+          <div class="card-school">Washington High School · New York, NY</div>
+        </div>
+      </div>
+
+      <!-- 7 — stat accent -->
+      <div class="card c-moss card-light card-stat">
+        <div class="stat-num">38</div>
+        <div class="stat-label">Partner schools</div>
+      </div>
+
+      <!-- 8 -->
+      <div class="card c-mauve card-light">
+        <p class="card-quote">"I walked into that circle thinking I'd be the odd one out. I walked out thinking everyone had felt that way at some point. That realization changed everything."</p>
+        <div class="card-footer">
+          <div class="card-name">Marcus T., 17</div>
+          <div class="card-school">MLK Jr. High School · Houston, TX</div>
+        </div>
+      </div>
+
+      <!-- 9 — accent phrase -->
+      <div class="card c-coral card-light card-accent">
+        <p class="card-quote">Seen. Heard. Valued.</p>
+        <p class="card-sub">What every IMU student deserves — and receives.</p>
+      </div>
+
+      <!-- 10 -->
+      <div class="card c-teal card-light">
+        <p class="card-quote">"I never thought a school program would make me call my grandmother and ask about her life. But here we are."</p>
+        <div class="card-footer">
+          <div class="card-name">Sofia P., 15</div>
+          <div class="card-school">Washington High School · New York, NY</div>
+        </div>
+      </div>
+
+      <!-- 11 — Aisha long -->
+      <div class="card c-ochre card-light">
+        <p class="card-quote">"I used to be afraid to bring up race in class. IMU trained me to lead conversations I once avoided. Now I run dialogue circles at my own school and watch students open up in ways no textbook ever could. This program didn't just change my school — it changed who I am."</p>
+        <div class="card-footer">
+          <div class="card-name">Aisha T., 18</div>
+          <div class="card-school">Youth Facilitator · Atlanta, GA</div>
+        </div>
+      </div>
+
+      <!-- 12 — short -->
+      <div class="card c-lavender card-light">
+        <p class="card-quote">"My culture has a place here. I didn't know that before."</p>
+        <div class="card-footer">
+          <div class="card-name">Yuna C., 15</div>
+          <div class="card-school">Roosevelt High School · Seattle, WA</div>
+        </div>
+      </div>
+
+      <!-- 13 — stat accent -->
+      <div class="card c-indigo card-light card-stat">
+        <div class="stat-num">94%</div>
+        <div class="stat-label">Feel more understood</div>
+      </div>
+
+      <!-- 14 -->
+      <div class="card c-blush card-light">
+        <p class="card-quote">"For the first time, someone asked me where my name came from — and actually wanted to know the full answer."</p>
+        <div class="card-footer">
+          <div class="card-name">Kwame A., 17</div>
+          <div class="card-school">Jefferson High School · Atlanta, GA</div>
+        </div>
+      </div>
+
+      <!-- 15 — short -->
+      <div class="card c-lime card-light">
+        <p class="card-quote">"The circle taught me to listen before I speak. I carry that everywhere now."</p>
+        <div class="card-footer">
+          <div class="card-name">Carlos V., 16</div>
+          <div class="card-school">Grant High School · Denver, CO</div>
+        </div>
+      </div>
+
+      <!-- 16 -->
+      <div class="card c-sand card-dark">
+        <p class="card-quote">"I brought what I learned home. My family noticed. My mom asked what happened to me. I said: someone finally asked me who I was."</p>
+        <div class="card-footer">
+          <div class="card-name">Fatima H., 14</div>
+          <div class="card-school">MLK Jr. Middle School · Houston, TX</div>
+        </div>
+      </div>
+
+      <!-- 17 — accent phrase -->
+      <div class="card c-sienna card-light card-accent">
+        <p class="card-quote">12 years of circles.</p>
+        <p class="card-sub">And counting.</p>
+      </div>
+
+      <!-- 18 — short -->
+      <div class="card c-teal card-light">
+        <p class="card-quote">"We didn't agree on everything. That was the point. I learned more from disagreement than I ever did from silence."</p>
+        <div class="card-footer">
+          <div class="card-name">Leila S., 18</div>
+          <div class="card-school">Grant High School · Denver, CO</div>
+        </div>
+      </div>
+
+      <!-- 19 -->
+      <div class="card c-dusk card-light">
+        <p class="card-quote">"IMU changed how I see myself. I think that's the part they don't advertise — it's not just about seeing others, it's about finally seeing yourself clearly too."</p>
+        <div class="card-footer">
+          <div class="card-name">Priya K., 15</div>
+          <div class="card-school">Roosevelt High School · Chicago, IL</div>
+        </div>
+      </div>
+
+      <!-- 20 — short accent -->
+      <div class="card c-peach card-dark">
+        <p class="card-quote">"I found my voice here."</p>
+        <div class="card-footer">
+          <div class="card-name">Mei L., 16</div>
+          <div class="card-school">Lincoln Middle School · Los Angeles, CA</div>
+        </div>
+      </div>
+
+      <!-- 21 -->
+      <div class="card c-olive card-light">
+        <p class="card-quote">"Our school felt different after IMU came in. I can't explain it exactly. It's like everyone remembered the other people in the room were real."</p>
+        <div class="card-footer">
+          <div class="card-name">Jordan A., 17</div>
+          <div class="card-school">Central High School · Houston, TX</div>
+        </div>
+      </div>
+
+      <!-- 22 — stat accent -->
+      <div class="card c-terracotta card-light card-stat">
+        <div class="stat-num">420+</div>
+        <div class="stat-label">Youth facilitators trained</div>
+      </div>
+
+      <!-- 23 -->
+      <div class="card c-mauve card-light">
+        <p class="card-quote">"I was the facilitator, but honestly the students taught me more than any training did. That's how it's supposed to work."</p>
+        <div class="card-footer">
+          <div class="card-name">Tomas R., 19</div>
+          <div class="card-school">IMU Youth Facilitator · Los Angeles, CA</div>
+        </div>
+      </div>
+
+      <!-- 24 — short -->
+      <div class="card c-sky card-light">
+        <p class="card-quote">"Nobody shushed anyone. That was new."</p>
+        <div class="card-footer">
+          <div class="card-name">Nadia B., 15</div>
+          <div class="card-school">Jefferson Middle School · Chicago, IL</div>
+        </div>
+      </div>
+
+    </div><!-- /mosaic -->
+  </section>
+
+  <!-- ── SECTION DIVIDER ── -->
+  <div class="grid-end">
+    <span class="grid-end-label">The Mission Behind Every Voice</span>
+  </div>
+
+  <!-- ── MISSION ── -->
+  <section class="mission" id="mission">
+    <p class="mission-label">Who We Are</p>
+    <h2 class="mission-h">
+      Building bridges,<br>one conversation at a time.
+    </h2>
+    <p class="mission-body">
+      IMU — Inspiring Multicultural Understanding — is a youth-led nonprofit dedicated
+      to cultivating empathy and belonging in K–12 schools across the country. We
+      create structured dialogue programs where students explore questions of culture,
+      race, and identity — not as abstractions, but as the lived reality of the people
+      sitting beside them.
+    </p>
+    <p class="mission-body">
+      The voices you just read are not testimonials. They are evidence. Evidence
+      that when young people are finally given the space to speak honestly, something
+      shifts — in them, in their schools, and in the communities around them.
+    </p>
+  </section>
+
+  <!-- ── STATS ── -->
+  <div class="stats">
+    <div class="stats-inner">
+      <div class="stat">
+        <div class="stat-n">4,200+</div>
+        <div class="stat-l">Students Reached</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n">38</div>
+        <div class="stat-l">Partner Schools</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n">12</div>
+        <div class="stat-l">Years Active</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n">94%</div>
+        <div class="stat-l">Feel More Understood</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DONATE ── -->
+  <section class="donate" id="donate">
+    <p class="donate-label">Support the Work</p>
+    <h2 class="donate-h">
+      Add your voice.<br>
+      <strong>Fund theirs.</strong>
+    </h2>
+    <p class="donate-body">
+      Every card in that mosaic represents a student who sat in a circle and found
+      something they didn't know they were missing. Your gift makes that possible
+      for thousands more.
+    </p>
+
+    <div class="tiers">
+      <div class="tier">
+        <div class="tier-amt">$25</div>
+        <div class="tier-desc">One student's full semester of dialogue materials</div>
+      </div>
+      <div class="tier">
+        <div class="tier-amt">$100</div>
+        <div class="tier-desc">A complete dialogue circle session for 15 students</div>
+      </div>
+      <div class="tier">
+        <div class="tier-amt">$250</div>
+        <div class="tier-desc">Sponsors a youth facilitator through full leadership training</div>
+      </div>
+      <div class="tier">
+        <div class="tier-amt">$1,000</div>
+        <div class="tier-desc">Brings IMU into a new school for an entire semester</div>
+      </div>
+    </div>
+
+    <div class="donate-btns">
+      <a href="#" class="btn-primary">Donate Now</a>
+      <a href="#" class="btn-secondary">Volunteer</a>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <span class="f-logo">IMU — Inspiring Multicultural Understanding</span>
+        <div class="f-links">
+          <a href="#">About</a>
+          <a href="#">Programs</a>
+          <a href="#">Schools</a>
+          <a href="#">Volunteer</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+      <div class="footer-base">
+        <p class="f-advocate">
+          Advocated by <strong>Elaine</strong>, IMU Advisory Board Member.
+        </p>
+        <p class="f-copy">© 2026 IMU · 501(c)(3) Nonprofit · Est. 2014</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
